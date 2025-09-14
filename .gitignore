@@ -1,0 +1,111 @@
+# Archivos y directorios a ignorar en Git
+
+# === ENTORNOS VIRTUALES ===
+.venv/
+venv/
+ENV/
+env/
+.ENV/
+.env/
+
+# === ARCHIVOS DE PYTHON ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# === JUPYTER NOTEBOOKS ===
+.ipynb_checkpoints
+
+# === PYTEST ===
+.pytest_cache/
+.coverage
+htmlcov/
+
+# === MYPY ===
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === SISTEMA OPERATIVO ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# === LOGS ===
+*.log
+logs/
+
+# === BASES DE DATOS ===
+*.db
+*.sqlite
+*.sqlite3
+
+# === MODELOS DE IA ===
+# Comentar la siguiente línea si quieres incluir el modelo en el repo
+# FigurasGeometricas.h5
+
+# === ARCHIVOS TEMPORALES ===
+*.tmp
+*.temp
+temp/
+tmp/
+
+# === ARCHIVOS DE CONFIGURACIÓN SENSIBLES ===
+.env
+config.ini
+secrets.json
+
+# === DEPENDENCIAS ===
+node_modules/
+
+# === ARCHIVOS DE RESPALDO ===
+*.bak
+*.backup
+
+# === ARCHIVOS DE CÁMARA/VIDEO ===
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# === IMÁGENES GENERADAS ===
+# Mantener las imágenes del dataset pero ignorar capturas temporales
+*LOG.jpg
+screenshot*.png
+capture*.jpg
+
+# === ARCHIVOS DE TEXTO GENERADOS ===
+requirements_current.txt
+
+# === CARPETAS DE SALIDA ===
+output/
+results/

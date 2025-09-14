@@ -1,0 +1,99 @@
+# GEOLEARNIA - Dependencias del Proyecto
+# ======================================
+# 
+# Este archivo contiene todas las dependencias necesarias para ejecutar
+# el proyecto GEOLEARNIA. Instalación: pip install -r requirements.txt
+
+# === DEPENDENCIAS PRINCIPALES ===
+
+# Computer Vision y procesamiento de imágenes
+opencv-python==4.8.1.78
+opencv-contrib-python==4.8.1.78
+
+# Machine Learning y Deep Learning
+tensorflow==2.20.0
+keras==3.11.3
+numpy==1.26.4
+
+# Aplicación web
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Base de datos y ORM
+SQLAlchemy==2.0.23
+
+# Seguridad y encriptación
+cryptography==41.0.7
+
+# Procesamiento de imágenes
+Pillow==10.0.1
+
+# Detección facial
+mtcnn==0.1.1
+
+# Procesamiento facial avanzado (opcional)
+mediapipe==0.10.5
+
+# Visualización y gráficos
+matplotlib==3.7.2
+
+# Procesamiento científico
+scipy==1.11.4
+
+# === DEPENDENCIAS ADICIONALES ===
+
+# Utilidades de TensorFlow
+absl-py==2.3.1
+astunparse==1.6.3
+flatbuffers==25.2.10
+gast==0.6.0
+google-pasta==0.2.0
+libclang==18.1.1
+opt-einsum==3.4.0
+protobuf==6.32.1
+tensorboard==2.20.0
+tensorboard-data-server==0.7.2
+
+# Utilidades de Flask
+blinker==1.9.0
+click==8.2.1
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+
+# Utilidades de red
+requests==2.32.5
+urllib3==2.5.0
+certifi==2025.8.3
+charset-normalizer==3.4.3
+idna==3.10
+
+# Utilidades de sistema
+grpcio==1.74.0
+h5py==3.14.0
+packaging==25.0
+setuptools>=80.9.0
+six==1.17.0
+termcolor==3.1.0
+typing-extensions==4.15.0
+wrapt==1.17.3
+wheel>=0.45.1
+
+# === INSTRUCCIONES DE INSTALACIÓN ===
+#
+# 1. Crear entorno virtual:
+#    python3 -m venv .venv
+#
+# 2. Activar entorno virtual:
+#    source .venv/bin/activate  (Linux/Mac)
+#    .venv\Scripts\activate     (Windows)
+#
+# 3. Instalar dependencias:
+#    pip install -r requirements.txt
+#
+# 4. En Ubuntu/Debian también instalar:
+#    sudo apt install python3-tk
+#
+# === VERSIONES COMPATIBLES ===
+# Python: 3.12+
+# SO: Ubuntu 20.04+, Windows 10+, macOS 10.14+

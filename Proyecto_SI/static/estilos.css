@@ -1,0 +1,22 @@
+.container{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('https://marketplace.canva.com/EAFKbkhOf9s/1/0/1600w/canva-v%C3%ADdeo-intro-de-video-doodle-infantil-amarillo-y-azul-_IBCJmaOZCI.jpg');
+    background-repeat: no-repeat;
+    color: black;
+    text-align: center;
+    background-size: cover;
+    background-attachment: fixed;
+    
+}
+
+h1{
+    color: black;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 50px;
+    text-transform: uppercase;
+    text-shadow: #555 2px 2px 3x;
+
+}
