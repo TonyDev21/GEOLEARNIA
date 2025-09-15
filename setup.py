@@ -182,39 +182,15 @@ def install_python_dependencies():
     return True
 
 def setup_database():
-    """Configurar base de datos"""
-    print_header("CONFIGURANDO BASE DE DATOS")
-    
-    python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv\\Scripts\\python"
-    
-    os.chdir("OpenCV")
-    if platform.system().lower() == "windows":
-        success = run_command(f"..\\{python_cmd} build_db.py", "Creando base de datos SQLite")
-    else:
-        success = run_command(f"../{python_cmd} build_db.py", "Creando base de datos SQLite")
-    os.chdir("..")
-    
-    if success:
-        print_colored("✅ Base de datos configurada exitosamente")
-    else:
-        print_colored("❌ Error configurando base de datos", Colors.FAIL)
-    
-    return success
+    """Configurar base de datos (función deprecada - ya no se usa)"""
+    print_colored("⚠️  Función deprecada: setup_database ya no es necesaria", Colors.WARNING)
+    return True
 
 def verify_installation():
     """Verificar instalación"""
     print_header("VERIFICANDO INSTALACIÓN")
     
     python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv\\Scripts\\python"
-    
-    # Verificar módulo OpenCV
-    print_colored("🔍 Verificando módulo OpenCV...")
-    os.chdir("OpenCV")
-    if platform.system().lower() == "windows":
-        opencv_ok = run_command(f"..\\{python_cmd} verificar_opencv.py", check=False)
-    else:
-        opencv_ok = run_command(f"../{python_cmd} verificar_opencv.py", check=False)
-    os.chdir("..")
     
     # Verificar módulo Proyecto_SI
     print_colored("🔍 Verificando módulo Proyecto_SI...")
@@ -225,7 +201,7 @@ def verify_installation():
         proyecto_ok = run_command(f"../{python_cmd} verificar_proyecto.py", check=False)
     os.chdir("..")
     
-    if opencv_ok and proyecto_ok:
+    if proyecto_ok:
         print_colored("✅ Instalación verificada exitosamente", Colors.OKGREEN)
         return True
     else:
@@ -244,20 +220,13 @@ def show_usage_instructions():
     print_colored("📋 COMANDOS PRINCIPALES:", Colors.OKBLUE)
     print_colored(f"   Activar entorno: {activate_cmd}")
     print()
-    print_colored("🌐 APLICACIÓN WEB (Recomendado):", Colors.OKBLUE)
+    print_colored("🌐 APLICACIÓN WEB:", Colors.OKBLUE)
     print_colored(f"   cd Proyecto_SI")
-    print_colored(f"   {python_cmd} web.py")
-    print_colored("   Abrir: http://127.0.0.1:5001")
+    print_colored(f"   {python_cmd} web_pointer.py")
+    print_colored("   Abrir: http://127.0.0.1:5002")
+    print_colored("   Compatible: PC, móviles, tablets")
     print()
-    print_colored("🔐 SISTEMA DE AUTENTICACIÓN:", Colors.OKBLUE)
-    print_colored(f"   cd OpenCV")
-    print_colored(f"   {python_cmd} main.py")
-    print()
-    print_colored("🖥️  APLICACIÓN DE ESCRITORIO:", Colors.OKBLUE)
-    print_colored(f"   cd Proyecto_SI")
-    print_colored(f"   {python_cmd} Video2.py")
-    print()
-    print_colored("📖 Ver README_GITHUB.md para documentación completa", Colors.OKCYAN)
+    print_colored("📖 Ver README.md para documentación completa", Colors.OKCYAN)
 
 def main():
     """Función principal"""
@@ -274,7 +243,6 @@ def main():
             ("Sistema", install_system_dependencies),
             ("Entorno Virtual", create_virtual_environment),
             ("Dependencias Python", install_python_dependencies),
-            ("Base de Datos", setup_database),
             ("Verificación", verify_installation)
         ]
         

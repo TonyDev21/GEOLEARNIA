@@ -69,21 +69,28 @@ pip install -r requirements.txt --force-reinstall
 ### 🚫 "Modelo no encontrado"
 Verificar que existe: `Proyecto_SI/FigurasGeometricas.h5`
 
-## 📱 Funciones Adicionales
+## 📱 Aplicación Web
 
-### Aplicación de Escritorio
+### Ejecutar GEOLEARNIA
 ```bash
+# Desde el directorio raíz
+python run_pointer.py
+
+# O desde Proyecto_SI
 cd Proyecto_SI
-python Video2.py
+python web_pointer.py
 ```
+
+**🌐 Acceso Web**: `http://127.0.0.1:5002`
+**📱 Compatible**: PC, móviles, tablets (cualquier navegador)
 
 ## 🔄 Para Desarrolladores
 
 ### Estructura de Archivos Principales
 - `Proyecto_SI/web_pointer.py` - Aplicación principal Flask
-- `Proyecto_SI/run_pointer.py` - Script de ejecución
 - `Proyecto_SI/templates/pointer.html` - Interfaz web
 - `Proyecto_SI/static/css/styles.css` - Estilos
+- `run_pointer.py` - Launcher desde directorio raíz
 
 ### Hacer Contribuciones
 1. Fork del repositorio

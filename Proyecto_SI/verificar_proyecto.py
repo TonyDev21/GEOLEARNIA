@@ -56,11 +56,9 @@ try:
     print("\n🎉 ¡Todas las verificaciones pasaron exitosamente!")
     print("📝 La aplicación web está lista para ejecutarse")
     print("💡 Para ejecutar la aplicación web:")
-    print("   python web.py")
-    print("💡 Para ejecutar la aplicación de escritorio:")
-    print("   python Video2.py")
-    print("💡 Para ejecutar detección básica sin IA:")
-    print("   python IA.py")
+    print("   python web_pointer.py")
+    print("💡 O desde el directorio raíz:")
+    print("   python run_pointer.py")
     
 except ImportError as e:
     print(f"❌ Error de importación: {e}")

@@ -6,7 +6,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Sistema de Inteligencia Artificial** para reconocimiento de figuras geométricas en tiempo real con sistema de puntero central optimizado.
+> **🌐 Aplicación Web Universal** de Inteligencia Artificial para reconocimiento de figuras geométricas en tiempo real. **Compatible con PC, móviles y tablets** a través del navegador web.
 
 ## 🚀 Inicio Rápido
 
@@ -23,6 +23,7 @@ python run_pointer.py
 ```
 
 **¡Listo!** 🎉 Abre tu navegador en `http://127.0.0.1:5002`
+**📱 Compatible con**: PC, móviles, tablets - ¡Úsalo desde cualquier dispositivo!
 
 ## ✨ Características Principales
 
@@ -42,22 +43,17 @@ python run_pointer.py
 
 ## 📱 Uso de la Aplicación
 
-### 🎯 Aplicación Principal - Puntero Central
+### 🎯 Aplicación Web Principal
 ```bash
 python run_pointer.py
 ```
 - Abre: `http://127.0.0.1:5002`
+- **Compatible con**: PC, móviles, tablets (cualquier dispositivo con navegador)
 - **Instrucciones**:
   1. 📍 Coloca el objeto en la cruz amarilla central
   2. 📦 Asegúrate de que esté dentro del rectángulo azul
   3. ⏳ Espera la detección automática
   4. ✅ Ve el resultado con porcentaje de confianza
-
-### 🖥️ Aplicación de Escritorio (Alternativa)
-```bash
-cd Proyecto_SI
-python Video2.py
-```
 
 ## 🛠️ Requisitos del Sistema
 
@@ -78,17 +74,24 @@ python Video2.py
 
 ```
 GEOLEARNIA/
-├── 📁 Proyecto_SI/              # 🎯 Aplicación Principal
+├── 📁 Proyecto_SI/              # � Aplicación Web Principal
 │   ├── web_pointer.py           # Servidor Flask con puntero central
-│   ├── run_pointer.py           # Script de ejecución
+│   ├── web.py                   # Aplicación web alternativa
 │   ├── FigurasGeometricas.h5    # Modelo CNN entrenado
 │   ├── templates/               # Templates HTML
-│   │   └── pointer.html         # Interfaz principal
+│   │   └── pointer.html         # Interfaz principal responsive
 │   ├── static/css/              # Estilos CSS
-│   │   └── styles.css           # Estilos de la aplicación
-│   └── dataset/                 # Imágenes de entrenamiento
-├── 📄 requirements.txt          # Dependencias
-└── 📄 run_pointer.py            # Launcher principal
+│   │   └── styles.css           # Estilos responsive para todos los dispositivos
+│   ├── dataset/                 # Imágenes de entrenamiento
+│   │   ├── circulo/             # Dataset círculos
+│   │   ├── cuadrado/            # Dataset cuadrados  
+│   │   └── triangulo/           # Dataset triángulos
+│   ├── Audios/                  # Archivos de audio
+│   ├── ModeloConvolucional.py   # Script de entrenamiento del modelo
+│   └── verificar_proyecto.py    # Script de verificación
+├── 📄 requirements.txt          # Dependencias Python
+├── 📄 run_pointer.py            # 🚀 Launcher principal desde raíz
+└── 📄 setup.py                  # Script de instalación automatizada
 ```
 
 ## 🎯 Objetos Detectables
@@ -98,6 +101,24 @@ GEOLEARNIA/
 | 🔴 **Círculo** | Monedas, tapas, discos | Usar objetos con borde definido |
 | 🟦 **Cuadrado** | Libros, cajas, tarjetas | Colocar en posición plana |
 | 🔺 **Triángulo** | Reglas, objetos triangulares | Asegurar visibilidad completa |
+
+## 🌐 ¿Por qué Aplicación Web Universal?
+
+### ✅ **Ventajas de la Aplicación Web**
+- **📱 Compatibilidad Universal**: Funciona en PC, móviles, tablets, Smart TV
+- **🔄 Sin Instalación**: Solo necesitas un navegador web
+- **🌍 Acceso Remoto**: Usa la app desde cualquier dispositivo en la red
+- **📊 Interfaz Responsive**: Se adapta automáticamente al tamaño de pantalla
+- **⚡ Actualizaciones Automáticas**: Siempre tienes la versión más reciente
+- **🛠️ Mantenimiento Simplificado**: Un solo código base
+- **🔒 Más Seguro**: No requiere instalación de software adicional
+
+### 📱 **Dispositivos Compatibles**
+- **💻 Computadoras**: Windows, macOS, Linux
+- **📱 Smartphones**: Android, iOS
+- **📟 Tablets**: iPad, Android tablets
+- **🖥️ Smart TVs**: Con navegador web
+- **🔗 Cualquier navegador**: Chrome, Firefox, Safari, Edge
 
 ## 📖 Guías Adicionales
 
