@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎯 GEOLEARNIA - Puntero Central</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 GEOLEARNIA</h1>
+        <p class="subtitle">Sistema de Detección Simple y Preciso</p>
+        
+        <div class="video-container">
+            <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Video Feed">
+        </div>
+        
+        <div class="instructions">
+            <div class="feature-box">
+                <h3>🎯 Cómo usar:</h3>
+                <p><span class="emoji">1️⃣</span> <strong>Coloca el objeto</strong> dentro del rectángulo amarillo</p>
+                <p><span class="emoji">2️⃣</span> <strong>Asegúrate</strong> de que el objeto esté completamente visible</p>
+                <p><span class="emoji">3️⃣</span> <strong>Espera</strong> - aparecerá un contorno verde y la predicción</p>
+                <p><span class="emoji">4️⃣</span> <strong>Ve el resultado</strong> con el nombre y porcentaje de confianza</p>
+            </div>
+            
+            <div class="feature-box">
+                <h3>📝 Formas Detectables:</h3>
+                <p><span class="emoji">🔴</span> <strong>Círculo:</strong> Monedas, tapas, objetos redondos</p>
+                <p><span class="emoji">🟦</span> <strong>Cuadrado:</strong> Libros, cajas, objetos rectangulares</p>
+                <p><span class="emoji">🔺</span> <strong>Triángulo:</strong> Objetos triangulares</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

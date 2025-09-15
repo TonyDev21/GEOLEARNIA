@@ -7,8 +7,8 @@
 # === DEPENDENCIAS PRINCIPALES ===
 
 # Computer Vision y procesamiento de imágenes
-opencv-python==4.8.1.78
-opencv-contrib-python==4.8.1.78
+opencv-python==4.12.0.90
+opencv-contrib-python==4.12.0.90
 
 # Machine Learning y Deep Learning
 tensorflow==2.20.0
@@ -16,8 +16,8 @@ keras==3.11.3
 numpy==1.26.4
 
 # Aplicación web
-Flask==2.3.3
-Werkzeug==2.3.7
+Flask==3.1.2
+Werkzeug==3.1.2
 
 # Base de datos y ORM
 SQLAlchemy==2.0.23

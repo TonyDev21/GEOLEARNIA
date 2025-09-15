@@ -159,7 +159,7 @@ def create_virtual_environment():
 def get_pip_command():
     """Obtener comando pip para el entorno virtual"""
     if platform.system().lower() == "windows":
-        return ".venv/Scripts/pip"
+        return ".venv\\Scripts\\pip"
     else:
         return ".venv/bin/pip"
 
@@ -185,10 +185,13 @@ def setup_database():
     """Configurar base de datos"""
     print_header("CONFIGURANDO BASE DE DATOS")
     
-    python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv/Scripts/python"
+    python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv\\Scripts\\python"
     
     os.chdir("OpenCV")
-    success = run_command(f"../{python_cmd} build_db.py", "Creando base de datos SQLite")
+    if platform.system().lower() == "windows":
+        success = run_command(f"..\\{python_cmd} build_db.py", "Creando base de datos SQLite")
+    else:
+        success = run_command(f"../{python_cmd} build_db.py", "Creando base de datos SQLite")
     os.chdir("..")
     
     if success:
@@ -202,18 +205,24 @@ def verify_installation():
     """Verificar instalación"""
     print_header("VERIFICANDO INSTALACIÓN")
     
-    python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv/Scripts/python"
+    python_cmd = ".venv/bin/python" if platform.system().lower() != "windows" else ".venv\\Scripts\\python"
     
     # Verificar módulo OpenCV
     print_colored("🔍 Verificando módulo OpenCV...")
     os.chdir("OpenCV")
-    opencv_ok = run_command(f"../{python_cmd} verificar_opencv.py", check=False)
+    if platform.system().lower() == "windows":
+        opencv_ok = run_command(f"..\\{python_cmd} verificar_opencv.py", check=False)
+    else:
+        opencv_ok = run_command(f"../{python_cmd} verificar_opencv.py", check=False)
     os.chdir("..")
     
     # Verificar módulo Proyecto_SI
     print_colored("🔍 Verificando módulo Proyecto_SI...")
     os.chdir("Proyecto_SI")
-    proyecto_ok = run_command(f"../{python_cmd} verificar_proyecto.py", check=False)
+    if platform.system().lower() == "windows":
+        proyecto_ok = run_command(f"..\\{python_cmd} verificar_proyecto.py", check=False)
+    else:
+        proyecto_ok = run_command(f"../{python_cmd} verificar_proyecto.py", check=False)
     os.chdir("..")
     
     if opencv_ok and proyecto_ok:

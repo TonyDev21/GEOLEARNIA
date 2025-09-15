@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Simple Video Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        img {
+            border: 2px solid #333;
+            max-width: 90%;
+        }
+        .info {
+            background: #fff;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Simple - GEOLEARNIA</h1>
+    
+    <div class="info">
+        <strong>URL del stream:</strong> <span id="stream-url"></span><br>
+        <strong>Estado:</strong> <span id="status">Cargando...</span><br>
+        <strong>Tamaño natural:</strong> <span id="dimensions">-</span>
+    </div>
+    
+    <div>
+        <img id="video" src="/video" alt="Video Stream">
+    </div>
+    
+    <script>
+        const video = document.getElementById('video');
+        const statusEl = document.getElementById('status');
+        const urlEl = document.getElementById('stream-url');
+        const dimensionsEl = document.getElementById('dimensions');
+        
+        // Mostrar URL actual
+        urlEl.textContent = window.location.origin + '/video';
+        
+        video.onload = function() {
+            statusEl.textContent = 'Stream cargado exitosamente';
+            statusEl.style.color = 'green';
+            dimensionsEl.textContent = video.naturalWidth + 'x' + video.naturalHeight;
+        };
+        
+        video.onerror = function() {
+            statusEl.textContent = 'Error al cargar el stream';
+            statusEl.style.color = 'red';
+            console.log('Error en imagen');
+        };
+        
+        // Verificar estado cada 3 segundos
+        setInterval(() => {
+            if (video.complete) {
+                if (video.naturalWidth === 0) {
+                    statusEl.textContent = 'Stream sin datos';
+                    statusEl.style.color = 'orange';
+                } else {
+                    statusEl.textContent = 'Stream activo';
+                    statusEl.style.color = 'green';
+                    dimensionsEl.textContent = video.naturalWidth + 'x' + video.naturalHeight;
+                }
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
