@@ -73,15 +73,8 @@ Verificar que existe: `Proyecto_SI/FigurasGeometricas.h5`
 
 ### Aplicación de Escritorio
 ```bash
-cd OpenCV
-python main.py
-```
-
-### Sistema de Login
-```bash
-cd OpenCV
-python build_db.py  # Crear base de datos primero
-python main.py      # Después ejecutar con login
+cd Proyecto_SI
+python Video2.py
 ```
 
 ## 🔄 Para Desarrolladores

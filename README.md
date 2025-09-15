@@ -6,7 +6,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Sistema Educativo de Inteligencia Artificial** para reconocimiento de figuras geométricas en tiempo real con sistema de puntero central optimizado.
+> **Sistema de Inteligencia Artificial** para reconocimiento de figuras geométricas en tiempo real con sistema de puntero central optimizado.
 
 ## 🚀 Inicio Rápido
 
@@ -18,8 +18,7 @@ cd GEOLEARNIA
 # 2. Instalar dependencias
 pip install -r requirements.txt
 
-# 3. Ejecutar aplicación principal
-cd Proyecto_SI
+# 3. Ejecutar aplicación
 python run_pointer.py
 ```
 
@@ -41,16 +40,10 @@ python run_pointer.py
 - **Alta Precisión**: Detección optimizada solo en zona central
 - **Confianza**: Porcentaje de certeza en cada predicción
 
-### 🔐 Sistema de Autenticación (Módulo Adicional)
-- **Login Biométrico**: Reconocimiento facial con OpenCV
-- **Login Tradicional**: Usuario y contraseña
-- **Base de Datos**: SQLite con encriptación
-
 ## 📱 Uso de la Aplicación
 
 ### 🎯 Aplicación Principal - Puntero Central
 ```bash
-cd Proyecto_SI
 python run_pointer.py
 ```
 - Abre: `http://127.0.0.1:5002`
@@ -60,17 +53,10 @@ python run_pointer.py
   3. ⏳ Espera la detección automática
   4. ✅ Ve el resultado con porcentaje de confianza
 
-### 🖥️ Aplicación de Escritorio (OpenCV)
+### 🖥️ Aplicación de Escritorio (Alternativa)
 ```bash
-cd OpenCV
-python main.py
-```
-
-### 🔐 Sistema de Autenticación
-```bash
-cd OpenCV
-python build_db.py  # Crear base de datos
-python main.py      # Iniciar aplicación con login
+cd Proyecto_SI
+python Video2.py
 ```
 
 ## 🛠️ Requisitos del Sistema
@@ -98,13 +84,11 @@ GEOLEARNIA/
 │   ├── FigurasGeometricas.h5    # Modelo CNN entrenado
 │   ├── templates/               # Templates HTML
 │   │   └── pointer.html         # Interfaz principal
-│   └── static/css/              # Estilos CSS
-│       └── styles.css           # Estilos de la aplicación
-├── 📁 OpenCV/                   # 🔐 Sistema de Autenticación
-│   ├── main.py                  # Aplicación principal con login
-│   ├── build_db.py              # Creador de base de datos
-│   └── forms/                   # Formularios GUI
-└── 📄 requirements.txt          # Dependencias
+│   ├── static/css/              # Estilos CSS
+│   │   └── styles.css           # Estilos de la aplicación
+│   └── dataset/                 # Imágenes de entrenamiento
+├── 📄 requirements.txt          # Dependencias
+└── 📄 run_pointer.py            # Launcher principal
 ```
 
 ## 🎯 Objetos Detectables
