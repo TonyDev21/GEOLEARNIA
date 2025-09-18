@@ -6,7 +6,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **🌐 Aplicación Web Universal** de Inteligencia Artificial para reconocimiento de figuras geométricas en tiempo real. **Compatible con PC, móviles y tablets** a través del navegador web.
+> **🌐 Aplicación Web ** de Inteligencia Artificial para reconocimiento de figuras geométricas en tiempo real. **Compatible con PC, móviles y tablets** a través del navegador web.
 
 ## 🚀 Inicio Rápido
 
@@ -29,7 +29,6 @@ python run_pointer.py
 
 ### 🎯 Sistema de Puntero Central
 - **Detección Precisa**: Área específica de análisis en el centro de la pantalla
-- **Cruz de Referencia**: Guía visual amarilla para posicionamiento
 - **Rectángulo de Detección**: Zona delimitada de 250x250 píxeles
 - **Contorno Verde**: Visualización del objeto detectado
 - **Punto Central**: Indicador rojo del centro del objeto
