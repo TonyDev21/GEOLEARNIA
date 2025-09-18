@@ -6,22 +6,167 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     text-align: center;
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Figuras geométricas de fondo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        /* Círculos en diferentes posiciones */
+        radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.12) 18px, transparent 19px),
+        radial-gradient(circle at 85% 75%, rgba(255, 255, 255, 0.08) 25px, transparent 26px),
+        radial-gradient(circle at 45% 15%, rgba(255, 255, 255, 0.06) 12px, transparent 13px),
+        radial-gradient(circle at 75% 35%, rgba(255, 255, 255, 0.1) 20px, transparent 21px),
+        radial-gradient(circle at 25% 85%, rgba(255, 255, 255, 0.05) 15px, transparent 16px),
+        radial-gradient(circle at 65% 90%, rgba(255, 255, 255, 0.09) 22px, transparent 23px),
+        /* Cuadrados con gradientes en diferentes orientaciones */
+        linear-gradient(45deg, rgba(255, 255, 255, 0.08) 30%, transparent 30%),
+        linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 30%, transparent 30%),
+        linear-gradient(45deg, transparent 70%, rgba(255, 255, 255, 0.07) 70%),
+        linear-gradient(-45deg, transparent 70%, rgba(255, 255, 255, 0.05) 70%);
+    background-size: 
+        180px 180px, 220px 220px, 140px 140px, 160px 160px, 120px 120px, 200px 200px,
+        50px 50px, 50px 50px, 50px 50px, 50px 50px;
+    background-position: 
+        0 0, 150px 120px, 250px 60px, 80px 180px, 320px 280px, 40px 350px,
+        0 0, 25px 25px, 100px 150px, 200px 50px;
+    animation: floatShapes 25s ease-in-out infinite;
+    z-index: -1;
+}
+
+/* Animación más suave de las figuras */
+@keyframes floatShapes {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+    25% { transform: translateY(-10px) rotate(2deg); opacity: 0.8; }
+    50% { transform: translateY(-20px) rotate(5deg); opacity: 0.9; }
+    75% { transform: translateY(-5px) rotate(3deg); opacity: 0.7; }
+}
+
+/* Triángulos usando pseudo-elementos */
+.geometric-triangles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    animation: floatTriangles 15s ease-in-out infinite;
+}
+
+.triangle-1 {
+    top: 12%;
+    left: 18%;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-bottom: 28px solid rgba(255, 255, 255, 0.12);
+    animation-delay: 0s;
+}
+
+.triangle-2 {
+    top: 68%;
+    left: 82%;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 38px solid rgba(255, 255, 255, 0.09);
+    animation-delay: 8s;
+}
+
+.triangle-3 {
+    top: 40%;
+    left: 8%;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 24px solid rgba(255, 255, 255, 0.07);
+    animation-delay: 16s;
+}
+
+.triangle-4 {
+    top: 28%;
+    left: 78%;
+    border-left: 19px solid transparent;
+    border-right: 19px solid transparent;
+    border-bottom: 33px solid rgba(255, 255, 255, 0.1);
+    animation-delay: 4s;
+}
+
+.triangle-5 {
+    top: 55%;
+    left: 45%;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 22px solid rgba(255, 255, 255, 0.06);
+    animation-delay: 12s;
+}
+
+@keyframes floatTriangles {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.9; }
+    20% { transform: translateY(-8px) rotate(72deg); opacity: 0.7; }
+    40% { transform: translateY(-15px) rotate(144deg); opacity: 0.8; }
+    60% { transform: translateY(-12px) rotate(216deg); opacity: 0.6; }
+    80% { transform: translateY(-5px) rotate(288deg); opacity: 0.85; }
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 15px;
     padding: 30px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 h1 {
     font-size: 2.5em;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* Agregar pequeñas figuras decorativas al título */
+h1::before {
+    content: '🔺';
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6em;
+    opacity: 0.7;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+h1::after {
+    content: '🔴';
+    position: absolute;
+    right: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6em;
+    opacity: 0.7;
+    animation: pulse 2s ease-in-out infinite reverse;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
 }
 
 .subtitle {
@@ -67,4 +212,41 @@ h1 {
 
 .emoji {
     font-size: 1.3em;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    h1::before,
+    h1::after {
+        display: none; /* Ocultar decoraciones en móviles para ahorrar espacio */
+    }
+    
+    .feature-box {
+        padding: 10px;
+        margin: 10px 0;
+    }
+    
+    /* Reducir el tamaño de las figuras de fondo en móviles */
+    body::before {
+        background-size: 
+            120px 120px, 150px 150px, 100px 100px, 110px 110px, 90px 90px, 130px 130px,
+            30px 30px, 30px 30px, 30px 30px, 30px 30px;
+    }
+    
+    .triangle {
+        transform: scale(0.7);
+    }
 }
