@@ -43,20 +43,37 @@ def initialize_camera():
     """Inicializar la cámara"""
     global camera
     try:
-        camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        camera.set(cv2.CAP_PROP_FPS, 30)
+        # Intentar diferentes métodos de captura
+        for backend in [cv2.CAP_V4L2, cv2.CAP_DSHOW, cv2.CAP_ANY]:
+            try:
+                camera = cv2.VideoCapture(0, backend)
+                if camera.isOpened():
+                    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+                    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+                    camera.set(cv2.CAP_PROP_FPS, 30)
+                    
+                    # Test de lectura
+                    ret, frame = camera.read()
+                    if ret and frame is not None:
+                        logger.info(f"✅ Cámara inicializada con backend {backend}")
+                        return True
+                    else:
+                        camera.release()
+                        camera = None
+                        continue
+                else:
+                    if camera:
+                        camera.release()
+                        camera = None
+                    continue
+            except Exception:
+                continue
         
-        if not camera.isOpened():
-            logger.error("❌ No se puede abrir la cámara")
-            return False
-        
-        logger.info("✅ Cámara inicializada")
-        return True
+        logger.warning("⚠️ No se encontró cámara física - usando modo demostración")
+        return True  # Continuar sin cámara para demo
     except Exception as e:
         logger.error(f"❌ Error inicializando cámara: {e}")
-        return False
+        return True  # Continuar sin cámara
 
 def get_full_frame_info(frame):
     """Obtener información del frame completo para análisis"""
@@ -219,26 +236,27 @@ def generate_frames():
     """Generador de frames para streaming"""
     global camera
     
-    if camera is None:
-        logger.error("❌ Cámara no inicializada")
-        return
-    
     frame_count = 0
     
     while True:
         try:
-            success, frame = camera.read()
-            if not success:
-                logger.error("❌ Error leyendo frame")
-                break
+            # Si hay cámara disponible, usarla
+            if camera is not None and camera.isOpened():
+                success, frame = camera.read()
+                if success and frame is not None:
+                    # Voltear horizontalmente para efecto espejo
+                    frame = cv2.flip(frame, 1)
+                    
+                    # Procesar frame con detección
+                    processed_frame = process_frame(frame)
+                else:
+                    # Si falla la lectura, generar frame de error
+                    processed_frame = generate_demo_frame("❌ Error leyendo cámara")
+            else:
+                # Sin cámara - generar frame de demostración
+                processed_frame = generate_demo_frame(f"📱 Modo Demostración - Frame {frame_count}")
             
             frame_count += 1
-            
-            # Voltear horizontalmente para efecto espejo
-            frame = cv2.flip(frame, 1)
-            
-            # Procesar frame con detección central
-            processed_frame = process_frame(frame)
             
             # Codificar frame
             ret, buffer = cv2.imencode('.jpg', processed_frame, 
@@ -249,8 +267,7 @@ def generate_frames():
             
             # Estadísticas cada 100 frames
             if frame_count % 100 == 0:
-                frame_sum = np.sum(processed_frame)
-                logger.info(f"📹 Frame {frame_count} OK - Sum: {frame_sum}")
+                logger.info(f"📹 Frame {frame_count} generado correctamente")
             
             # Convertir a bytes para streaming
             frame_bytes = buffer.tobytes()
@@ -260,7 +277,50 @@ def generate_frames():
         
         except Exception as e:
             logger.error(f"❌ Error en generate_frames: {e}")
-            break
+            # Generar frame de error
+            try:
+                error_frame = generate_demo_frame("❌ Error en streaming")
+                ret, buffer = cv2.imencode('.jpg', error_frame)
+                if ret:
+                    frame_bytes = buffer.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            except:
+                pass
+
+def generate_demo_frame(message="📱 GEOLEARNIA Demo"):
+    """Generar frame de demostración cuando no hay cámara"""
+    # Crear imagen base
+    frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    
+    # Fondo degradado
+    for i in range(480):
+        color_intensity = int(50 + (i / 480) * 100)
+        frame[i, :] = [color_intensity, color_intensity//2, color_intensity//3]
+    
+    # Texto principal
+    cv2.putText(frame, "GEOLEARNIA", (120, 200), 
+                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 3)
+    
+    # Mensaje de estado
+    cv2.putText(frame, message, (50, 250), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (200, 255, 200), 2)
+    
+    # Instrucciones
+    cv2.putText(frame, "En produccion: Permitir acceso a camara", (80, 320), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    cv2.putText(frame, "En local: Verificar camara conectada", (100, 350), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    
+    # Formas de ejemplo
+    cv2.circle(frame, (150, 400), 30, (0, 255, 0), -1)  # Círculo verde
+    cv2.rectangle(frame, (220, 370), (280, 430), (0, 0, 255), -1)  # Cuadrado rojo
+    
+    # Triángulo
+    pts = np.array([[350, 430], [320, 370], [380, 370]], np.int32)
+    cv2.fillPoly(frame, [pts], (255, 0, 0))  # Triángulo azul
+    
+    return frame
 
 @app.route('/')
 def index():
