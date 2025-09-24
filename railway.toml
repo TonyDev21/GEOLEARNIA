@@ -5,3 +5,6 @@ builder = "nixpacks"
 startCommand = "python app.py"
 healthcheckPath = "/"
 healthcheckTimeout = 100
+
+[build.env]
+NIXPACKS_PYTHON_VERSION = "3.11"

@@ -1,0 +1,76 @@
+# Archivos y directorios a ignorar en Docker build
+# ===============================================
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentación
+README*.md
+CHANGELOG.md
+CONTRIBUTING.md
+TROUBLESHOOTING.md
+GITHUB_CHECKLIST.md
+LICENSE
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Node modules (si hay alguno)
+node_modules/
+
+# Archivos específicos del proyecto que no se necesitan en producción
+setup.py
+run.py
+
+# Carpeta OpenCV completa (solo necesitamos Proyecto_SI)
+OpenCV/
+
+# Archivos grandes innecesarios
+*.zip
+*.tar.gz
+*.exe
+*.msi
+
+# Excluir modelo temporalmente para reducir tamaño
+# FigurasGeometricas.h5
