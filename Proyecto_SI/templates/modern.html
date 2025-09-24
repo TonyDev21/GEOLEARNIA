@@ -173,10 +173,57 @@
             border: 1px solid rgba(0, 255, 0, 0.5);
         }
 
+        .analysis-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            color: white;
+        }
+
+        .switch input:checked + .slider {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border-color: #00ff88;
+        }
+
+        .switch input:checked + .slider::before {
+            content: "🔍 Análisis Automático ✅";
+        }
+
+        .switch input:not(:checked) + .slider::before {
+            content: "🔍 Análisis Manual ⏸️";
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             .controls { flex-direction: column; align-items: center; }
             .btn { width: 200px; }
+            .analysis-toggle { margin-top: 10px; }
         }
     </style>
 </head>
@@ -192,11 +239,16 @@
             <div class="controls">
                 <button id="startBtn" class="btn primary">📷 Iniciar Cámara</button>
                 <button id="stopBtn" class="btn" disabled>⏹️ Detener</button>
-                <button id="analyzeBtn" class="btn" disabled>🔍 Analizar Forma</button>
+                <div class="analysis-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="autoAnalyze" checked>
+                        <span class="slider">🔍 Análisis Automático</span>
+                    </label>
+                </div>
             </div>
             
             <div id="status" class="status">
-                💡 Presiona "Iniciar Cámara" para comenzar
+                💡 Presiona "Iniciar Cámara" → Reconocimiento automático en tiempo real
             </div>
             
             <div id="result" class="result" style="display: none;">
@@ -208,12 +260,14 @@
         <div class="instructions">
             <h3>📋 Instrucciones de Uso:</h3>
             <ul>
-                <li>🔴 <strong>Círculos:</strong> Muestra monedas, botones, tapas redondas</li>
-                <li>🟦 <strong>Cuadrados:</strong> Muestra libros, cajas, papeles cuadrados</li>
-                <li>🔺 <strong>Triángulos:</strong> Muestra reglas triangulares, formas cortadas</li>
-                <li>💡 Asegúrate de que la figura esté bien iluminada</li>
-                <li>📏 Mantén una distancia apropiada de la cámara</li>
-                <li>🎯 Presiona "Analizar Forma" para realizar la detección</li>
+                <li>� <strong>Iniciar Cámara:</strong> Permite acceso a tu cámara</li>
+                <li>🔄 <strong>Reconocimiento Automático:</strong> Analiza en tiempo real cada 2 segundos</li>
+                <li>🔴 <strong>Círculos:</strong> Monedas, botones, tapas redondas</li>
+                <li>🟦 <strong>Cuadrados:</strong> Libros, cajas, papeles cuadrados</li>
+                <li>🔺 <strong>Triángulos:</strong> Reglas triangulares, formas cortadas</li>
+                <li>💡 <strong>Iluminación:</strong> Asegúrate de buena luz</li>
+                <li>📏 <strong>Distancia:</strong> Mantén la forma visible y centrada</li>
+                <li>⏸️ <strong>Control:</strong> Puedes desactivar el análisis automático</li>
             </ul>
         </div>
     </div>
@@ -226,7 +280,7 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.startBtn = document.getElementById('startBtn');
                 this.stopBtn = document.getElementById('stopBtn');
-                this.analyzeBtn = document.getElementById('analyzeBtn');
+                this.autoAnalyze = document.getElementById('autoAnalyze');
                 this.status = document.getElementById('status');
                 this.result = document.getElementById('result');
                 this.shapeResult = document.getElementById('shapeResult');
@@ -234,6 +288,9 @@
                 
                 this.stream = null;
                 this.isAnalyzing = false;
+                this.analysisInterval = null;
+                this.lastAnalysisTime = 0;
+                this.analysisDelay = 2000; // Analizar cada 2 segundos
                 
                 this.initializeEvents();
                 this.checkAPIStatus();
@@ -242,7 +299,7 @@
             initializeEvents() {
                 this.startBtn.addEventListener('click', () => this.startCamera());
                 this.stopBtn.addEventListener('click', () => this.stopCamera());
-                this.analyzeBtn.addEventListener('click', () => this.analyzeFrame());
+                this.autoAnalyze.addEventListener('change', () => this.toggleAutoAnalysis());
             }
             
             async checkAPIStatus() {
@@ -273,11 +330,15 @@
                         this.canvas.width = this.video.videoWidth;
                         this.canvas.height = this.video.videoHeight;
                         
-                        this.updateStatus('✅ Cámara activa - ¡Muestra una forma geométrica!', 'success');
+                        this.updateStatus('✅ Cámara activa - Reconocimiento automático iniciado', 'success');
                         
                         this.startBtn.disabled = true;
                         this.stopBtn.disabled = false;
-                        this.analyzeBtn.disabled = false;
+                        
+                        // Iniciar análisis automático
+                        if (this.autoAnalyze.checked) {
+                            this.startAutoAnalysis();
+                        }
                     };
                     
                 } catch (error) {
@@ -299,6 +360,8 @@
             }
             
             stopCamera() {
+                this.stopAutoAnalysis();
+                
                 if (this.stream) {
                     this.stream.getTracks().forEach(track => track.stop());
                     this.stream = null;
@@ -309,19 +372,42 @@
                 
                 this.startBtn.disabled = false;
                 this.stopBtn.disabled = true;
-                this.analyzeBtn.disabled = true;
                 this.result.style.display = 'none';
+            }
+            
+            toggleAutoAnalysis() {
+                if (this.stream && this.autoAnalyze.checked) {
+                    this.startAutoAnalysis();
+                    this.updateStatus('✅ Análisis automático activado', 'success');
+                } else {
+                    this.stopAutoAnalysis();
+                    this.updateStatus('⏸️ Análisis automático desactivado', '');
+                }
+            }
+            
+            startAutoAnalysis() {
+                this.stopAutoAnalysis(); // Limpiar cualquier análisis anterior
+                
+                this.analysisInterval = setInterval(async () => {
+                    if (!this.isAnalyzing && this.stream && this.autoAnalyze.checked) {
+                        await this.analyzeFrame();
+                    }
+                }, this.analysisDelay);
+            }
+            
+            stopAutoAnalysis() {
+                if (this.analysisInterval) {
+                    clearInterval(this.analysisInterval);
+                    this.analysisInterval = null;
+                }
             }
             
             async analyzeFrame() {
                 if (!this.stream || this.isAnalyzing) return;
                 
                 this.isAnalyzing = true;
-                this.analyzeBtn.disabled = true;
                 
                 try {
-                    this.updateStatus('🔍 Analizando imagen...', 'loading');
-                    
                     // Capturar frame del video
                     this.ctx.drawImage(this.video, 0, 0);
                     const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
@@ -342,23 +428,21 @@
                     if (data.success) {
                         if (data.detection) {
                             this.showResult(data.detection.shape, data.detection.confidence);
-                            this.updateStatus(data.message, 'success');
+                            this.updateStatus(`🎯 ${data.detection.shape.toUpperCase()} detectado (${(data.detection.confidence * 100).toFixed(1)}%)`, 'success');
                         } else {
-                            this.updateStatus(data.message, '');
+                            this.updateStatus('🔍 Buscando formas geométricas...', 'loading');
                             this.result.style.display = 'none';
                         }
                     } else {
-                        this.updateStatus(`❌ Error: ${data.error}`, 'error');
-                        this.result.style.display = 'none';
+                        console.error('Analysis error:', data.error);
+                        // No mostrar errores menores al usuario durante análisis automático
                     }
                     
                 } catch (error) {
                     console.error('Error analyzing frame:', error);
-                    this.updateStatus('❌ Error de conexión con el servidor', 'error');
-                    this.result.style.display = 'none';
+                    // No interrumpir análisis automático por errores menores
                 } finally {
                     this.isAnalyzing = false;
-                    this.analyzeBtn.disabled = false;
                 }
             }
             
