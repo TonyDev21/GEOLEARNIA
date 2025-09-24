@@ -32,7 +32,7 @@ Pillow==10.0.1
 mtcnn==0.1.1
 
 # Procesamiento facial avanzado (opcional)
-mediapipe==0.10.5
+mediapipe==0.10.21
 
 # Visualización y gráficos
 matplotlib==3.7.2
