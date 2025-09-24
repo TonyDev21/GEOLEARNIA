@@ -19,7 +19,15 @@ from PIL import Image
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+# Configurar Flask con paths absolutos
+template_dir = os.path.abspath('templates')
+static_dir = os.path.abspath('static')
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
+logger.info(f"📁 Template dir: {template_dir}")
+logger.info(f"📁 Static dir: {static_dir}")
+logger.info(f"📄 Templates disponibles: {os.listdir(template_dir) if os.path.exists(template_dir) else 'No existe'}")
 
 # Variables globales
 model = None
@@ -242,15 +250,16 @@ def cleanup():
     """Limpiar recursos"""
     pass
 
+# Inicialización global para Railway/Gunicorn
+logger.info("� Inicializando GEOLEARNIA para Railway...")
+model_loaded = load_model()
+if model_loaded:
+    logger.info("✅ Modelo preocargado correctamente")
+else:
+    logger.warning("⚠️ Modelo no disponible - funcionando en modo simulado")
+
 if __name__ == '__main__':
     logger.info("🚀 Iniciando GEOLEARNIA v3.0 - Reconocimiento Visual Automático")
-    
-    # Cargar modelo de IA
-    model_loaded = load_model()
-    if model_loaded:
-        logger.info("✅ Modelo de IA cargado correctamente")
-    else:
-        logger.warning("⚠️ Funcionando sin modelo - predicciones simuladas")
     
     # Configurar puerto
     port = int(os.environ.get('PORT', 5000))
@@ -262,11 +271,3 @@ if __name__ == '__main__':
         app.run(host=host, port=port, debug=False, threaded=True)
     finally:
         cleanup()
-
-# Inicialización global para Railway
-logger.info("🔧 Inicializando GEOLEARNIA para Railway...")
-model_loaded = load_model()
-if model_loaded:
-    logger.info("✅ Modelo preocargado correctamente")
-else:
-    logger.warning("⚠️ Modelo no disponible - funcionando en modo simulado")
