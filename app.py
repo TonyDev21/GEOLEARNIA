@@ -136,23 +136,58 @@ def detect_object_in_frame(frame):
 
 @app.route('/')
 def index():
-    """Página principal"""
+    """Página principal con diagnóstico mejorado"""
     try:
+        logger.info("Intentando cargar index.html...")
         return render_template('index.html')
     except Exception as e:
         logger.error(f"Error sirviendo index.html: {e}")
-        return f"""
-        <h1>🎓 GEOLEARNIA v3.0</h1>
-        <p>Reconocimiento Visual Automático con IA</p>
-        <p>Error cargando template: {e}</p>
-        <p>Directorio actual: {os.getcwd()}</p>
-        <p>Archivos disponibles: {os.listdir('.')}</p>
-        """, 500
+        
+        # Diagnóstico completo
+        diagnostics = {
+            "error": str(e),
+            "base_dir": base_dir,
+            "project_si_dir": project_si_dir,
+            "template_dir": template_dir,
+            "static_dir": static_dir,
+            "template_exists": os.path.exists(os.path.join(template_dir, 'index.html')),
+            "css_exists": os.path.exists(os.path.join(static_dir, 'css', 'geolearnia.css')),
+            "current_dir": os.getcwd(),
+            "files_in_current": os.listdir('.') if os.path.exists('.') else [],
+            "files_in_base": os.listdir(base_dir) if os.path.exists(base_dir) else []
+        }
+        
+        html_response = f"""
+        <h1>🎓 GEOLEARNIA v3.0 - Diagnóstico</h1>
+        <h2>Error:</h2>
+        <pre>{diagnostics['error']}</pre>
+        <h2>Diagnóstico:</h2>
+        <pre>{str(diagnostics)}</pre>
+        """
+        
+        return html_response, 500
 
 @app.route('/health')
 def health_check():
-    """Health check para Railway"""
-    return "OK", 200
+    """Health check para Railway con diagnóstico"""
+    try:
+        status = {
+            "status": "OK",
+            "version": "3.0",
+            "timestamp": str(os.getpid()),
+            "directories": {
+                "base_dir": os.path.exists(base_dir),
+                "project_si": os.path.exists(project_si_dir),
+                "templates": os.path.exists(template_dir),
+                "static": os.path.exists(static_dir)
+            },
+            "model_loaded": model is not None
+        }
+        logger.info(f"Health check: {status}")
+        return jsonify(status), 200
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return jsonify({"status": "ERROR", "error": str(e)}), 500
 
 @app.route('/api/status')
 def api_status():
@@ -240,9 +275,23 @@ if __name__ == '__main__':
     host = os.environ.get('HOST', '0.0.0.0')
     
     logger.info(f"🌐 Servidor iniciando en {host}:{port}")
+    logger.info(f"📂 Variables de entorno PORT: {os.environ.get('PORT')}")
+    logger.info(f"📂 Variables de entorno RAILWAY_*: {[k for k in os.environ.keys() if k.startswith('RAILWAY')]}")
+    logger.info(f"📂 Directorio actual: {os.getcwd()}")
+    logger.info(f"📂 Archivos en raíz: {os.listdir('.')}")
+    
+    if os.path.exists('Proyecto_SI'):
+        logger.info(f"📂 Archivos en Proyecto_SI: {os.listdir('Proyecto_SI')}")
+        if os.path.exists('Proyecto_SI/templates'):
+            logger.info(f"📂 Templates disponibles: {os.listdir('Proyecto_SI/templates')}")
+        if os.path.exists('Proyecto_SI/static'):
+            logger.info(f"📂 Static disponible: {os.listdir('Proyecto_SI/static')}")
     
     try:
+        logger.info("🚀 Iniciando Flask app...")
         app.run(host=host, port=port, debug=False, threaded=True)
     except Exception as e:
-        logger.error(f"Error iniciando servidor: {e}")
+        logger.error(f"💥 Error iniciando servidor: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise
