@@ -58,47 +58,30 @@ def initialize_camera():
         logger.error(f"❌ Error inicializando cámara: {e}")
         return False
 
-def draw_detection_area(frame):
-    """Dibujar área de detección simple y limpia"""
+def get_full_frame_info(frame):
+    """Obtener información del frame completo para análisis"""
     h, w = frame.shape[:2]
     center_x, center_y = w // 2, h // 2
     
-    # Área de análisis - rectángulo más grande y visible
-    analysis_size = 250
-    top_left = (center_x - analysis_size//2, center_y - analysis_size//2)
-    bottom_right = (center_x + analysis_size//2, center_y + analysis_size//2)
+    # Ya no hay área específica - usar todo el frame
+    # Sin texto adicional - solo análisis de la imagen completa
     
-    # Rectángulo principal - línea más gruesa
-    cv2.rectangle(frame, top_left, bottom_right, (0, 255, 255), 3)
-    
-    # Texto instructivo arriba del rectángulo
-    cv2.putText(frame, "COLOCA EL OBJETO AQUI", (center_x - 130, center_y - 140), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-    
-    return center_x, center_y, analysis_size
+    return center_x, center_y, min(h, w)  # Usar toda la imagen
 
-def extract_center_region(frame, center_x, center_y, size):
-    """Extraer región central para análisis"""
+def get_full_frame_region(frame):
+    """Usar todo el frame para análisis - sin restricciones de área"""
     h, w = frame.shape[:2]
     
-    # Calcular límites de la región central
-    half_size = size // 2
-    x1 = max(0, center_x - half_size)
-    y1 = max(0, center_y - half_size)
-    x2 = min(w, center_x + half_size)
-    y2 = min(h, center_y + half_size)
-    
-    # Extraer región
-    roi = frame[y1:y2, x1:x2]
-    return roi, (x1, y1, x2, y2)
+    # Devolver todo el frame como región de interés
+    return frame, (0, 0, w, h)
 
-def detect_object_in_center(roi):
-    """Detectar objeto en la región central usando contornos"""
-    if roi.size == 0:
+def detect_object_in_full_frame(frame):
+    """Detectar objeto en todo el frame usando contornos"""
+    if frame.size == 0:
         return None, None
     
     # Convertir a escala de grises
-    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
     # Aplicar desenfoque para suavizar
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -115,8 +98,8 @@ def detect_object_in_center(roi):
     # Obtener el contorno más grande
     largest_contour = max(contours, key=cv2.contourArea)
     
-    # Filtrar contornos muy pequeños (ajustado para área más grande)
-    if cv2.contourArea(largest_contour) < 800:
+    # Filtrar contornos muy pequeños (área mínima para detección)
+    if cv2.contourArea(largest_contour) < 1000:
         return None, None
     
     return largest_contour, edges
@@ -158,70 +141,77 @@ def predict_shape(roi):
         return "error", 0.0
 
 def process_frame(frame):
-    """Procesar frame con detección en zona central"""
-    # Dibujar área de detección y obtener coordenadas
-    center_x, center_y, analysis_size = draw_detection_area(frame)
+    """Procesar frame con detección en todo el área"""
+    # Obtener información del frame completo y agregar texto discreto
+    center_x, center_y, frame_size = get_full_frame_info(frame)
     
-    # Extraer región central
-    roi, (x1, y1, x2, y2) = extract_center_region(frame, center_x, center_y, analysis_size)
+    # Usar todo el frame como región de interés
+    roi, (x1, y1, x2, y2) = get_full_frame_region(frame)
     
-    # Detectar objeto en la región central
-    contour, edges = detect_object_in_center(roi)
+    # Detectar objeto en todo el frame
+    contour, edges = detect_object_in_full_frame(frame)
     
     prediction_text = ""
     
     if contour is not None:
-        # Ajustar contorno a coordenadas globales
-        contour_global = contour + np.array([x1, y1])
+        # El contorno ya está en coordenadas globales (todo el frame)
+        contour_global = contour
         
         # Dibujar contorno del objeto detectado
-        cv2.drawContours(frame, [contour_global], -1, (0, 255, 0), 2)
+        cv2.drawContours(frame, [contour_global], -1, (0, 255, 0), 3)
         
         # Calcular centro del objeto
         M = cv2.moments(contour)
         if M["m00"] != 0:
-            obj_center_x = int(M["m10"] / M["m00"]) + x1
-            obj_center_y = int(M["m01"] / M["m00"]) + y1
+            obj_center_x = int(M["m10"] / M["m00"])
+            obj_center_y = int(M["m01"] / M["m00"])
             
             # Marcar centro del objeto
-            cv2.circle(frame, (obj_center_x, obj_center_y), 5, (0, 0, 255), -1)
+            cv2.circle(frame, (obj_center_x, obj_center_y), 8, (0, 0, 255), -1)
             
             # Rectángulo alrededor del objeto
             x, y, w, h = cv2.boundingRect(contour_global)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
         
-        # Predecir forma
-        shape_name, confidence = predict_shape(roi)
+        # Predecir forma usando todo el frame
+        shape_name, confidence = predict_shape(frame)
         
         # Siempre mostrar la predicción si es válida
         if shape_name != "error" and shape_name != "desconocido":
             prediction_text = f"{shape_name.upper()}: {confidence:.1f}%"
             
-            # Mostrar predicción con fondo para mejor visibilidad
-            text_size = cv2.getTextSize(prediction_text, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 2)[0]
-            text_x = center_x - text_size[0] // 2
-            text_y = center_y + 160
+            # Mostrar predicción en la parte inferior del frame
+            h, w = frame.shape[:2]
+            text_size = cv2.getTextSize(prediction_text, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 3)[0]
+            text_x = (w - text_size[0]) // 2  # Centrar horizontalmente
+            text_y = h - 30  # Posición en la parte inferior (30px desde abajo)
             
             # Fondo para el texto
-            cv2.rectangle(frame, (text_x - 10, text_y - 35), (text_x + text_size[0] + 10, text_y + 5), (0, 0, 0), -1)
+            cv2.rectangle(frame, (text_x - 15, text_y - 40), (text_x + text_size[0] + 15, text_y + 10), (0, 0, 0), -1)
             
             # Color según la confianza
-            if confidence > 30:
+            if confidence > 70:
                 text_color = (0, 255, 0)  # Verde para alta confianza
+            elif confidence > 40:
+                text_color = (0, 255, 255)  # Amarillo para confianza media
             else:
-                text_color = (0, 255, 255)  # Amarillo para baja confianza
+                text_color = (255, 255, 255)  # Blanco para baja confianza
             
             # Texto de predicción
             cv2.putText(frame, prediction_text, (text_x, text_y), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 1.0, text_color, 2)
-        else:
-            # Error en predicción
-            cv2.putText(frame, "ERROR EN PREDICCION", (center_x - 100, center_y + 160), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                       cv2.FONT_HERSHEY_SIMPLEX, 1.2, text_color, 3)
     else:
-        # Sin objeto detectado
-        cv2.putText(frame, "Coloca un objeto en el area", (center_x - 120, center_y + 160), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (128, 128, 128), 2)
+        # Sin objeto detectado - mensaje discreto en la parte inferior
+        h, w = frame.shape[:2]
+        message = "Muestra una figura geometrica"
+        text_size = cv2.getTextSize(message, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
+        text_x = (w - text_size[0]) // 2  # Centrar horizontalmente
+        text_y = h - 25  # Posición en la parte inferior
+        
+        # Fondo sutil para el mensaje
+        cv2.rectangle(frame, (text_x - 10, text_y - 30), (text_x + text_size[0] + 10, text_y + 5), (50, 50, 50), -1)
+        cv2.putText(frame, message, (text_x, text_y), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.8, (200, 200, 200), 2)
     
     return frame
 
