@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOLEARNIA v3.0 - Reconocimiento Visual Automático</title>
+    <title>GEOLEARNIA v2.0 - Reconocimiento de Figuras Geométricas</title>
     <style>
         * {
             margin: 0;
-            padding: 0;
+           <div class="instructions">
+            <h3>📋 Cómo Usar GEOLEARNIA:</h3>
+            <ul>
+                <li>📷 <strong>Inicia tu cámara</strong> y apunta a cualquier objeto</li>
+                <li>🎯 <strong>Reconocimiento automático</strong> - sin botones adicionales</li>
+                <li>👀 <strong>Guía visual</strong> - verás contornos verdes cuando detecte formas</li>
+                <li>🔴 <strong>Círculos:</strong> Monedas, botones, tapas redondas</li>
+                <li>🟦 <strong>Cuadrados:</strong> Libros, cajas, papeles cuadrados</li>
+                <li>🔺 <strong>Triángulos:</strong> Reglas triangulares, señales</li>
+                <li>💡 <strong>Consejos:</strong> Buena iluminación y formas centradas</li>
+            </ul>
+        </div>ing: 0;
             box-sizing: border-box;
         }
 
@@ -20,7 +31,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             text-align: center;
         }
@@ -28,7 +39,7 @@
         h1 {
             font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .version {
@@ -90,65 +101,90 @@
         }
 
         .btn {
-            padding: 15px 30px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn.primary {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
             color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .btn.primary:hover:not(:disabled) {
-            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none !important;
+            transform: none;
         }
 
-        .btn:not(:disabled):hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        .btn.primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: 2px solid #ff6b6b;
         }
 
         .status {
-            margin: 15px 0;
+            margin: 20px 0;
             padding: 15px;
+            background: rgba(255,255,255,0.1);
             border-radius: 10px;
-            font-weight: bold;
             font-size: 1.1em;
-            transition: all 0.3s ease;
         }
 
-        .status.success {
-            background: rgba(0, 255, 136, 0.2);
-            border: 2px solid #00ff88;
-            color: #00ff88;
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
-        .status.error {
-            background: rgba(255, 107, 107, 0.2);
-            border: 2px solid #ff6b6b;
-            color: #ff6b6b;
+        .shape-detected {
+            font-size: 2em;
+            margin-bottom: 10px;
         }
 
-        .status.loading {
-            background: rgba(255, 202, 40, 0.2);
-            border: 2px solid #ffca28;
-            color: #ffca28;
+        .confidence {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            text-align: left;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .instructions h3 {
+            margin-top: 0;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            margin-top: 15px;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+        }
+
+        .loading {
             animation: pulse 2s infinite;
         }
 
@@ -158,79 +194,74 @@
             100% { opacity: 1; }
         }
 
-        .result {
-            background: rgba(0, 255, 136, 0.1);
-            border: 2px solid #00ff88;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 400px;
-            display: none;
-            flex-direction: column;
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.5);
+        }
+
+        .analysis-toggle {
+            display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
 
-        .shape-detected {
-            font-size: 2em;
-            font-weight: bold;
-            color: #00ff88;
+        .switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
         }
 
-        .confidence {
-            font-size: 1.2em;
-            color: #ffffff;
-            opacity: 0.9;
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
-        .instructions {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 30px auto;
-            max-width: 800px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            text-align: left;
-        }
-
-        .instructions h3 {
-            color: #fff;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.5em;
-        }
-
-        .instructions ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .instructions li {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .instructions li:hover {
+        .slider {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
             background: rgba(255,255,255,0.2);
-            transform: translateX(5px);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            color: white;
+        }
+
+        .switch input:checked + .slider {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            border-color: #00ff88;
+        }
+
+        .switch input:checked + .slider::before {
+            content: "🔍 Análisis Automático ✅";
+        }
+
+        .switch input:not(:checked) + .slider::before {
+            content: "🔍 Análisis Manual ⏸️";
         }
 
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             .controls { flex-direction: column; align-items: center; }
             .btn { width: 200px; }
-            .instructions { margin: 20px 10px; padding: 20px; }
+            .analysis-toggle { margin-top: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎓 GEOLEARNIA</h1>
-        <div class="version">v3.0 - Reconocimiento Visual Automático</div>
+        <div class="version">v2.0 - Arquitectura Web Moderna</div>
         
         <div class="camera-container">
             <div class="video-wrapper">
@@ -255,15 +286,16 @@
         </div>
         
         <div class="instructions">
-            <h3>📋 Cómo Usar GEOLEARNIA:</h3>
+            <h3>📋 Instrucciones de Uso:</h3>
             <ul>
-                <li>📷 <strong>Inicia tu cámara</strong> y apunta a cualquier objeto</li>
-                <li>🎯 <strong>Reconocimiento automático</strong> - sin botones adicionales</li>
-                <li>👀 <strong>Guía visual</strong> - verás contornos verdes cuando detecte formas</li>
+                <li>� <strong>Iniciar Cámara:</strong> Permite acceso a tu cámara</li>
+                <li>🔄 <strong>Reconocimiento Automático:</strong> Analiza en tiempo real cada 2 segundos</li>
                 <li>🔴 <strong>Círculos:</strong> Monedas, botones, tapas redondas</li>
                 <li>🟦 <strong>Cuadrados:</strong> Libros, cajas, papeles cuadrados</li>
-                <li>🔺 <strong>Triángulos:</strong> Reglas triangulares, señales</li>
-                <li>💡 <strong>Consejos:</strong> Buena iluminación y formas centradas</li>
+                <li>🔺 <strong>Triángulos:</strong> Reglas triangulares, formas cortadas</li>
+                <li>💡 <strong>Iluminación:</strong> Asegúrate de buena luz</li>
+                <li>📏 <strong>Distancia:</strong> Mantén la forma visible y centrada</li>
+                <li>⏸️ <strong>Control:</strong> Puedes desactivar el análisis automático</li>
             </ul>
         </div>
     </div>
@@ -298,7 +330,7 @@
                 this.stopBtn.addEventListener('click', () => this.stopCamera());
                 this.video.addEventListener('loadedmetadata', () => this.resizeCanvas());
             }
-
+            
             async checkAPIStatus() {
                 try {
                     const response = await fetch('/api/status');
@@ -325,7 +357,7 @@
                         video: {
                             width: { ideal: 640 },
                             height: { ideal: 480 },
-                            facingMode: 'environment'
+                            facingMode: 'environment' // Usar cámara trasera en móviles
                         }
                     });
                     
@@ -396,16 +428,16 @@
             }
             
             async analyzeFrame() {
-                if (this.isAnalyzing || !this.stream) return;
+                if (!this.stream || this.isAnalyzing) return;
                 
                 this.isAnalyzing = true;
                 
                 try {
                     // Capturar frame del video
-                    this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.drawImage(this.video, 0, 0);
                     const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
                     
-                    // Enviar para análisis
+                    // Enviar al servidor para análisis
                     const response = await fetch('/api/analyze', {
                         method: 'POST',
                         headers: {
@@ -541,8 +573,8 @@
                 this.status.className = `status ${type}`;
             }
         }
-
-        // Inicializar la aplicación cuando se cargue la página
+        
+        // Inicializar aplicación cuando cargue la página
         document.addEventListener('DOMContentLoaded', () => {
             new GeoLearnia();
         });
