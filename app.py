@@ -296,35 +296,54 @@ def analyze_frame():
             })
         
         # Detectar objeto
-        contour, edges = detect_object_in_frame(frame)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        contour, edges = detect_object_in_frame(frame_rgb)
         
         if contour is None:
             return jsonify({
                 'success': True,
                 'detection': None,
-                'message': 'No se detectó ningún objeto'
+                'message': 'Buscando figuras geométricas...'
             })
         
-        # Extraer región de interés
+        # Extraer región de interés con padding
         x, y, w, h = cv2.boundingRect(contour)
-        roi = frame[y:y+h, x:x+w]
         
-        if roi.size == 0:
+        # Agregar padding para mejor análisis
+        padding = 20
+        x_pad = max(0, x - padding)
+        y_pad = max(0, y - padding)
+        w_pad = min(frame.shape[1] - x_pad, w + 2*padding)
+        h_pad = min(frame.shape[0] - y_pad, h + 2*padding)
+        
+        roi = frame[y_pad:y_pad+h_pad, x_pad:x_pad+w_pad]
+        
+        if roi.size == 0 or roi.shape[0] < 10 or roi.shape[1] < 10:
             return jsonify({
                 'success': True,
                 'detection': None,
-                'message': 'ROI vacía'
+                'message': 'Región detectada muy pequeña'
             })
         
         # Predicción
         shape, confidence = predict_with_model(roi)
+        
+        # Solo devolver detecciones con confianza razonable
+        if confidence < 0.4:
+            return jsonify({
+                'success': True,
+                'detection': None,
+                'message': f'Confianza baja ({confidence:.2f}) - Acerca más el objeto'
+            })
+        
+        logger.info(f"Detección exitosa: {shape} ({confidence:.3f})")
         
         return jsonify({
             'success': True,
             'detection': {
                 'shape': shape,
                 'confidence': confidence,
-                'bbox': [int(x), int(y), int(w), int(h)]
+                'bbox': [int(x_pad), int(y_pad), int(w_pad), int(h_pad)]
             }
         })
         

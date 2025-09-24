@@ -1,6 +1,6 @@
 /**
  * GEOLEARNIA v3.0 - Reconocimiento Visual Automático
- * Funcionalidad JavaScript Principal
+ * JavaScript mejorado y corregido
  */
 
 class GeoLearnia {
@@ -21,7 +21,7 @@ class GeoLearnia {
         this.isAnalyzing = false;
         this.analysisInterval = null;
         this.lastAnalysisTime = 0;
-        this.analysisDelay = 1500; // Analizar cada 1.5 segundos
+        this.analysisDelay = 2000; // Aumentado a 2 segundos para mejor estabilidad
         
         this.initializeEvents();
         this.checkAPIStatus();
@@ -38,17 +38,21 @@ class GeoLearnia {
             const response = await fetch('/api/status');
             const data = await response.json();
             console.log('API Status:', data);
+            this.updateStatus('✅ Sistema listo - Presiona "Iniciar Cámara"', 'success');
         } catch (error) {
             console.error('Error checking API status:', error);
+            this.updateStatus('⚠️ Sistema iniciando...', 'loading');
         }
     }
 
     resizeCanvas() {
-        // Sincronizar el tamaño del overlay con el video
+        // Sincronizar tamaños
         this.overlay.width = this.video.videoWidth;
         this.overlay.height = this.video.videoHeight;
         this.canvas.width = this.video.videoWidth;
         this.canvas.height = this.video.videoHeight;
+        
+        console.log(`Canvas resized to: ${this.canvas.width}x${this.canvas.height}`);
     }
     
     async startCamera() {
@@ -73,7 +77,7 @@ class GeoLearnia {
                 this.startBtn.disabled = true;
                 this.stopBtn.disabled = false;
                 
-                // Iniciar análisis automático inmediatamente
+                // Iniciar análisis automático
                 this.startAutoAnalysis();
             };
             
@@ -105,21 +109,23 @@ class GeoLearnia {
         
         this.video.srcObject = null;
         this.clearOverlay();
-        this.updateStatus('📷 Cámara detenida', '');
+        this.result.style.display = 'none';
         
         this.startBtn.disabled = false;
         this.stopBtn.disabled = true;
-        this.result.style.display = 'none';
+        
+        this.updateStatus('📷 Cámara detenida', '');
     }
     
     startAutoAnalysis() {
-        this.stopAutoAnalysis(); // Limpiar cualquier análisis anterior
+        if (this.analysisInterval) return;
         
         this.analysisInterval = setInterval(async () => {
-            if (!this.isAnalyzing && this.stream) {
+            if (Date.now() - this.lastAnalysisTime >= this.analysisDelay) {
                 await this.analyzeFrame();
+                this.lastAnalysisTime = Date.now();
             }
-        }, this.analysisDelay);
+        }, 500); // Verificar cada 500ms
     }
     
     stopAutoAnalysis() {
@@ -135,9 +141,12 @@ class GeoLearnia {
         this.isAnalyzing = true;
         
         try {
-            // Capturar frame del video
+            // Capturar frame
             this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
             const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Mostrar estado de análisis
+            this.updateStatus('🔍 Analizando...', 'loading');
             
             // Enviar para análisis
             const response = await fetch('/api/analyze', {
@@ -157,7 +166,7 @@ class GeoLearnia {
             const data = await response.json();
             
             if (data.success) {
-                this.clearOverlay(); // Limpiar overlay anterior
+                this.clearOverlay();
                 
                 if (data.detection) {
                     const { shape, confidence, bbox } = data.detection;
@@ -166,25 +175,31 @@ class GeoLearnia {
                     this.showResult(shape, confidence);
                     this.updateStatus(`🎯 ${shape.toUpperCase()} detectado (${(confidence * 100).toFixed(1)}%)`, 'success');
                     
-                    // Dibujar indicador visual mejorado
+                    // Dibujar indicadores visuales
                     this.drawDetectionOverlay(data.detection);
                     
-                    // Dibujar bounding box si está disponible
                     if (bbox && bbox.length === 4) {
                         this.drawBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3]);
                     }
                 } else {
-                    this.updateStatus('🔍 Escaneando... Coloca una figura geométrica', 'loading');
+                    this.updateStatus('🔍 Escaneando... Coloca una figura geométrica clara', 'loading');
                     this.result.style.display = 'none';
                 }
             } else {
                 console.warn('Analysis error:', data.error);
-                this.updateStatus('⚠️ Error de análisis: ' + (data.error || 'Error desconocido'), 'error');
+                this.updateStatus('⚠️ Análisis en curso...', 'loading');
             }
             
         } catch (error) {
             console.error('Error analyzing frame:', error);
-            this.updateStatus('❌ Error de conexión con el servidor', 'error');
+            this.updateStatus('❌ Error de conexión - Reintentando...', 'error');
+            
+            // Auto-reintentar después de un error
+            setTimeout(() => {
+                if (this.stream) {
+                    this.updateStatus('🔍 Reconectando...', 'loading');
+                }
+            }, 3000);
         } finally {
             this.isAnalyzing = false;
         }
@@ -197,7 +212,7 @@ class GeoLearnia {
     drawBoundingBox(x, y, w, h) {
         const ctx = this.overlayCtx;
         
-        // Escalar coordenadas del bounding box al tamaño del canvas
+        // Escalar coordenadas
         const scaleX = this.overlay.width / this.canvas.width;
         const scaleY = this.overlay.height / this.canvas.height;
         
@@ -206,123 +221,106 @@ class GeoLearnia {
         const scaledW = w * scaleX;
         const scaledH = h * scaleY;
         
-        // Dibujar rectángulo de detección
-        ctx.strokeStyle = '#00ff88';
-        ctx.lineWidth = 3;
+        // Dibujar rectángulo principal
+        ctx.strokeStyle = '#00ff00';
+        ctx.lineWidth = 4;
         ctx.strokeRect(scaledX, scaledY, scaledW, scaledH);
         
-        // Dibujar esquinas para mejor visualización
-        const cornerSize = 15;
-        ctx.lineWidth = 4;
+        // Dibujar esquinas destacadas
+        const cornerSize = 20;
+        ctx.lineWidth = 6;
         
-        // Esquina superior izquierda
-        ctx.beginPath();
-        ctx.moveTo(scaledX, scaledY + cornerSize);
-        ctx.lineTo(scaledX, scaledY);
-        ctx.lineTo(scaledX + cornerSize, scaledY);
-        ctx.stroke();
+        // Esquinas
+        const corners = [
+            {x: scaledX, y: scaledY, dirs: [[1,0],[0,1]]}, // Superior izquierda
+            {x: scaledX + scaledW, y: scaledY, dirs: [[-1,0],[0,1]]}, // Superior derecha
+            {x: scaledX, y: scaledY + scaledH, dirs: [[1,0],[0,-1]]}, // Inferior izquierda
+            {x: scaledX + scaledW, y: scaledY + scaledH, dirs: [[-1,0],[0,-1]]} // Inferior derecha
+        ];
         
-        // Esquina superior derecha
-        ctx.beginPath();
-        ctx.moveTo(scaledX + scaledW - cornerSize, scaledY);
-        ctx.lineTo(scaledX + scaledW, scaledY);
-        ctx.lineTo(scaledX + scaledW, scaledY + cornerSize);
-        ctx.stroke();
-        
-        // Esquina inferior izquierda
-        ctx.beginPath();
-        ctx.moveTo(scaledX, scaledY + scaledH - cornerSize);
-        ctx.lineTo(scaledX, scaledY + scaledH);
-        ctx.lineTo(scaledX + cornerSize, scaledY + scaledH);
-        ctx.stroke();
-        
-        // Esquina inferior derecha
-        ctx.beginPath();
-        ctx.moveTo(scaledX + scaledW - cornerSize, scaledY + scaledH);
-        ctx.lineTo(scaledX + scaledW, scaledY + scaledH);
-        ctx.lineTo(scaledX + scaledW, scaledY + scaledH - cornerSize);
-        ctx.stroke();
+        corners.forEach(corner => {
+            corner.dirs.forEach(dir => {
+                ctx.beginPath();
+                ctx.moveTo(corner.x, corner.y);
+                ctx.lineTo(corner.x + dir[0] * cornerSize, corner.y + dir[1] * cornerSize);
+                ctx.stroke();
+            });
+        });
     }
     
     drawDetectionOverlay(detection) {
         const ctx = this.overlayCtx;
         const centerX = this.overlay.width / 2;
         const centerY = this.overlay.height / 2;
-        const size = 100; // Tamaño del indicador
+        const size = 100;
         
-        // Configurar estilo del dibujo
-        ctx.strokeStyle = '#00ff88';
-        ctx.lineWidth = 4;
-        ctx.fillStyle = 'rgba(0, 255, 136, 0.2)';
+        // Configurar estilo
+        ctx.strokeStyle = '#ffff00'; // Amarillo brillante
+        ctx.lineWidth = 5;
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
         
-        // Dibujar según la forma detectada
         ctx.beginPath();
         
         if (detection.shape === 'circulo') {
+            // Círculo con punto central
             ctx.arc(centerX, centerY, size/2, 0, 2 * Math.PI);
-            ctx.stroke();
             ctx.fill();
+            ctx.stroke();
             
-            // Texto indicador
-            this.drawShapeLabel(centerX, centerY - size/2 - 30, '🔴 CÍRCULO', detection.confidence);
+            // Punto central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ff0000';
+            ctx.fill();
             
         } else if (detection.shape === 'cuadrado') {
-            ctx.rect(centerX - size/2, centerY - size/2, size, size);
-            ctx.stroke();
+            // Cuadrado con cruz
+            const halfSize = size/2;
+            ctx.rect(centerX - halfSize, centerY - halfSize, size, size);
             ctx.fill();
+            ctx.stroke();
             
-            this.drawShapeLabel(centerX, centerY - size/2 - 30, '🟦 CUADRADO', detection.confidence);
+            // Cruz central
+            ctx.beginPath();
+            ctx.moveTo(centerX - 15, centerY);
+            ctx.lineTo(centerX + 15, centerY);
+            ctx.moveTo(centerX, centerY - 15);
+            ctx.lineTo(centerX, centerY + 15);
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 3;
+            ctx.stroke();
             
         } else if (detection.shape === 'triangulo') {
-            ctx.moveTo(centerX, centerY - size/2);
-            ctx.lineTo(centerX - size/2, centerY + size/2);
-            ctx.lineTo(centerX + size/2, centerY + size/2);
+            // Triángulo con punto central
+            const height = size * 0.866;
+            ctx.moveTo(centerX, centerY - height/2);
+            ctx.lineTo(centerX - size/2, centerY + height/2);
+            ctx.lineTo(centerX + size/2, centerY + height/2);
             ctx.closePath();
-            ctx.stroke();
             ctx.fill();
+            ctx.stroke();
             
-            this.drawShapeLabel(centerX, centerY - size/2 - 30, '🔺 TRIÁNGULO', detection.confidence);
+            // Punto central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ff0000';
+            ctx.fill();
         }
         
-        // Crosshair en el centro
-        this.drawCrosshair(centerX, centerY);
-    }
-    
-    drawShapeLabel(x, y, text, confidence) {
-        const ctx = this.overlayCtx;
-        
+        // Etiqueta de texto
         ctx.font = 'bold 18px Arial';
-        ctx.fillStyle = '#00ff88';
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        ctx.shadowBlur = 4;
-        
-        ctx.fillText(text, x, y);
-        ctx.fillText(`${(confidence * 100).toFixed(1)}%`, x, y + 25);
-        
-        ctx.shadowBlur = 0; // Reset shadow
-    }
-    
-    drawCrosshair(x, y) {
-        const ctx = this.overlayCtx;
-        const size = 20;
-        
-        ctx.strokeStyle = '#ff4444';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#000000';
         ctx.lineWidth = 2;
-        
-        // Cruz horizontal y vertical
-        ctx.beginPath();
-        ctx.moveTo(x - size, y);
-        ctx.lineTo(x + size, y);
-        ctx.moveTo(x, y - size);
-        ctx.lineTo(x, y + size);
-        ctx.stroke();
+        const text = `${detection.shape.toUpperCase()} (${(detection.confidence * 100).toFixed(1)}%)`;
+        ctx.strokeText(text, 10, 30);
+        ctx.fillText(text, 10, 30);
     }
     
     showResult(shape, confidence) {
         const shapeEmojis = {
             'circulo': '🔴',
-            'cuadrado': '🟦',
+            'cuadrado': '🟦', 
             'triangulo': '🔺',
             'desconocido': '❓'
         };
@@ -338,7 +336,7 @@ class GeoLearnia {
     }
 }
 
-// Inicializar la aplicación cuando se cargue la página
+// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
     new GeoLearnia();
 });
