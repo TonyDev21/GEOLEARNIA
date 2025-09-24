@@ -1,0 +1,1 @@
+web: cd Proyecto_SI && python web_pointer.py
