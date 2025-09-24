@@ -265,7 +265,13 @@ def generate_frames():
 @app.route('/')
 def index():
     """Página principal"""
-    return render_template('pointer.html')
+    return render_template('index.html')
+
+@app.route('/video')
+def video():
+    """Ruta para el feed de video (compatibilidad con template)"""
+    return Response(generate_frames(),
+                   mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/video_feed')
 def video_feed():
