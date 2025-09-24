@@ -18,8 +18,8 @@ from web_api import app
 
 if __name__ == '__main__':
     import os
-    port = int(os.environ.get('PORT', 5002))
+    port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
-    print(f"🚀 Iniciando GEOLEARNIA v2.0 en {host}:{port}")
-    print("🎯 Arquitectura Web Moderna - Cámara del Usuario")
+    print(f"🚀 Iniciando GEOLEARNIA v3.0 en {host}:{port}")
+    print("🎯 Reconocimiento Visual Automático con IA")
     app.run(host=host, port=port, debug=False, threaded=True)

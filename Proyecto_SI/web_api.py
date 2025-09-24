@@ -149,7 +149,11 @@ def image_to_base64(image):
 @app.route('/')
 def index():
     """Página principal"""
-    return render_template('index.html')
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        logger.error(f"Error sirviendo index.html: {e}")
+        return f"<h1>GEOLEARNIA v3.0</h1><p>Error: {e}</p><p>Template path issue</p>", 500
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze_frame():
@@ -226,15 +230,20 @@ def api_status():
     return jsonify({
         'status': 'online',
         'model_loaded': model is not None,
-        'version': '2.0 - Arquitectura Web Moderna'
+        'version': '3.0 - Reconocimiento Visual Automático'
     })
+
+@app.route('/health')
+def health_check():
+    """Health check para Railway"""
+    return "OK", 200
 
 def cleanup():
     """Limpiar recursos"""
     pass
 
 if __name__ == '__main__':
-    logger.info("🚀 Iniciando GEOLEARNIA v2.0 - Arquitectura Web Moderna")
+    logger.info("🚀 Iniciando GEOLEARNIA v3.0 - Reconocimiento Visual Automático")
     
     # Cargar modelo de IA
     model_loaded = load_model()
@@ -244,7 +253,7 @@ if __name__ == '__main__':
         logger.warning("⚠️ Funcionando sin modelo - predicciones simuladas")
     
     # Configurar puerto
-    port = int(os.environ.get('PORT', 5002))
+    port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
     
     logger.info(f"🌐 Servidor iniciando en {host}:{port}")
@@ -253,3 +262,11 @@ if __name__ == '__main__':
         app.run(host=host, port=port, debug=False, threaded=True)
     finally:
         cleanup()
+
+# Inicialización global para Railway
+logger.info("🔧 Inicializando GEOLEARNIA para Railway...")
+model_loaded = load_model()
+if model_loaded:
+    logger.info("✅ Modelo preocargado correctamente")
+else:
+    logger.warning("⚠️ Modelo no disponible - funcionando en modo simulado")
