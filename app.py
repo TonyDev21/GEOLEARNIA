@@ -22,20 +22,15 @@ logger = logging.getLogger(__name__)
 
 logger.info("🚀 Iniciando GEOLEARNIA v3.0...")
 
-# Cambiar al directorio correcto
-try:
-    project_dir = os.path.join(os.path.dirname(__file__), 'Proyecto_SI')
-    if os.path.exists(project_dir):
-        os.chdir(project_dir)
-        logger.info(f"📂 Cambiado a directorio: {project_dir}")
-    else:
-        logger.warning("📂 Usando directorio actual")
-except Exception as e:
-    logger.error(f"Error cambiando directorio: {e}")
+# Obtener directorio base del proyecto
+base_dir = os.path.dirname(os.path.abspath(__file__))
+project_si_dir = os.path.join(base_dir, 'Proyecto_SI')
+logger.info(f"📂 Directorio base: {base_dir}")
+logger.info(f"📂 Directorio Proyecto_SI: {project_si_dir}")
 
-# Configurar Flask
-template_dir = os.path.abspath('templates') if os.path.exists('templates') else 'templates'
-static_dir = os.path.abspath('static') if os.path.exists('static') else 'static'
+# Configurar Flask con rutas absolutas
+template_dir = os.path.join(base_dir, 'Proyecto_SI', 'templates')
+static_dir = os.path.join(base_dir, 'Proyecto_SI', 'static')
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
@@ -50,7 +45,7 @@ def load_model():
     """Cargar el modelo de TensorFlow"""
     global model
     try:
-        model_path = 'FigurasGeometricas.h5'
+        model_path = os.path.join(base_dir, 'Proyecto_SI', 'FigurasGeometricas.h5')
         if os.path.exists(model_path):
             model = keras.models.load_model(model_path)
             logger.info(f"✅ Modelo cargado: {model_path}")
@@ -245,7 +240,6 @@ if __name__ == '__main__':
     host = os.environ.get('HOST', '0.0.0.0')
     
     logger.info(f"🌐 Servidor iniciando en {host}:{port}")
-    logger.info(f"📂 Directorio de trabajo: {os.getcwd()}")
     
     try:
         app.run(host=host, port=port, debug=False, threaded=True)

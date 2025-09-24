@@ -1,1 +1,1 @@
-web: cd Proyecto_SI && python web_pointer.py
+web: python app.py
