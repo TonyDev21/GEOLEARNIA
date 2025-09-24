@@ -1,23 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GEOLEARNIA - Reconocimiento de Figuras Geométricas</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      color: white;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOLEARNIA v3.0 - Reconocimiento Visual Automático</title>
+    <link rel="stylesheet" href="/static/css/geolearnia.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 GEOLEARNIA</h1>
+        <div class="version">v3.0 - Reconocimiento Visual con IA</div>
+        
+        <div class="camera-container">
+            <div class="video-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="overlay"></canvas>
+            </div>
+            <canvas id="canvas" style="display: none;"></canvas>
+            
+            <div class="controls">
+                <button id="startBtn" class="btn primary">📷 Iniciar Cámara</button>
+                <button id="stopBtn" class="btn" disabled>⏹️ Detener Cámara</button>
+            </div>
+            
+            <div id="status" class="status">
+                💡 Presiona "Iniciar Cámara" para empezar el reconocimiento automático
+            </div>
+            
+            <div id="result" class="result" style="display: none;">
+                <div class="shape-detected" id="shapeResult"></div>
+                <div class="confidence" id="confidenceResult"></div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 Cómo Usar GEOLEARNIA:</h3>
+            <ul>
+                <li>📷 <strong>Iniciar Cámara:</strong> Permite acceso a tu cámara para empezar</li>
+                <li>🎯 <strong>Reconocimiento Automático:</strong> La IA analiza automáticamente cada 1.5 segundos</li>
+                <li>👀 <strong>Guías Visuales:</strong> Verás contornos verdes cuando detecte una forma</li>
+                <li>🔴 <strong>Círculos:</strong> Monedas, botones, tapas redondas, discos</li>
+                <li>🟦 <strong>Cuadrados:</strong> Libros, cajas, papeles cuadrados, tarjetas</li>
+                <li>🔺 <strong>Triángulos:</strong> Reglas triangulares, formas cortadas, señales</li>
+                <li>💡 <strong>Iluminación:</strong> Asegúrate de tener buena luz natural o artificial</li>
+                <li>📏 <strong>Distancia:</strong> Mantén el objeto visible y centrado en la pantalla</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/static/js/geolearnia.js"></script>
+</body>
+</html>
     }
     
     h1 {

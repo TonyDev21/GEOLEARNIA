@@ -149,7 +149,7 @@ def image_to_base64(image):
 @app.route('/')
 def index():
     """Página principal"""
-    return render_template('modern.html')
+    return render_template('index.html')
 
 @app.route('/api/analyze', methods=['POST'])
 def analyze_frame():
