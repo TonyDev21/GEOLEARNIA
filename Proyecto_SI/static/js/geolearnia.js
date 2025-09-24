@@ -150,29 +150,41 @@ class GeoLearnia {
                 })
             });
             
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
             
             if (data.success) {
                 this.clearOverlay(); // Limpiar overlay anterior
                 
                 if (data.detection) {
-                    this.showResult(data.detection.shape, data.detection.confidence);
-                    this.updateStatus(`🎯 ${data.detection.shape.toUpperCase()} detectado (${(data.detection.confidence * 100).toFixed(1)}%)`, 'success');
+                    const { shape, confidence, bbox } = data.detection;
                     
-                    // Dibujar indicador visual en el overlay
+                    // Mostrar resultado
+                    this.showResult(shape, confidence);
+                    this.updateStatus(`🎯 ${shape.toUpperCase()} detectado (${(confidence * 100).toFixed(1)}%)`, 'success');
+                    
+                    // Dibujar indicador visual mejorado
                     this.drawDetectionOverlay(data.detection);
+                    
+                    // Dibujar bounding box si está disponible
+                    if (bbox && bbox.length === 4) {
+                        this.drawBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3]);
+                    }
                 } else {
-                    this.updateStatus('🔍 Escaneando formas...', 'loading');
+                    this.updateStatus('🔍 Escaneando... Coloca una figura geométrica', 'loading');
                     this.result.style.display = 'none';
                 }
             } else {
-                console.error('Analysis error:', data.error);
-                // No mostrar errores menores al usuario durante análisis automático
+                console.warn('Analysis error:', data.error);
+                this.updateStatus('⚠️ Error de análisis: ' + (data.error || 'Error desconocido'), 'error');
             }
             
         } catch (error) {
             console.error('Error analyzing frame:', error);
-            // No interrumpir análisis automático por errores menores
+            this.updateStatus('❌ Error de conexión con el servidor', 'error');
         } finally {
             this.isAnalyzing = false;
         }
@@ -180,6 +192,56 @@ class GeoLearnia {
     
     clearOverlay() {
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+    }
+    
+    drawBoundingBox(x, y, w, h) {
+        const ctx = this.overlayCtx;
+        
+        // Escalar coordenadas del bounding box al tamaño del canvas
+        const scaleX = this.overlay.width / this.canvas.width;
+        const scaleY = this.overlay.height / this.canvas.height;
+        
+        const scaledX = x * scaleX;
+        const scaledY = y * scaleY;
+        const scaledW = w * scaleX;
+        const scaledH = h * scaleY;
+        
+        // Dibujar rectángulo de detección
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(scaledX, scaledY, scaledW, scaledH);
+        
+        // Dibujar esquinas para mejor visualización
+        const cornerSize = 15;
+        ctx.lineWidth = 4;
+        
+        // Esquina superior izquierda
+        ctx.beginPath();
+        ctx.moveTo(scaledX, scaledY + cornerSize);
+        ctx.lineTo(scaledX, scaledY);
+        ctx.lineTo(scaledX + cornerSize, scaledY);
+        ctx.stroke();
+        
+        // Esquina superior derecha
+        ctx.beginPath();
+        ctx.moveTo(scaledX + scaledW - cornerSize, scaledY);
+        ctx.lineTo(scaledX + scaledW, scaledY);
+        ctx.lineTo(scaledX + scaledW, scaledY + cornerSize);
+        ctx.stroke();
+        
+        // Esquina inferior izquierda
+        ctx.beginPath();
+        ctx.moveTo(scaledX, scaledY + scaledH - cornerSize);
+        ctx.lineTo(scaledX, scaledY + scaledH);
+        ctx.lineTo(scaledX + cornerSize, scaledY + scaledH);
+        ctx.stroke();
+        
+        // Esquina inferior derecha
+        ctx.beginPath();
+        ctx.moveTo(scaledX + scaledW - cornerSize, scaledY + scaledH);
+        ctx.lineTo(scaledX + scaledW, scaledY + scaledH);
+        ctx.lineTo(scaledX + scaledW, scaledY + scaledH - cornerSize);
+        ctx.stroke();
     }
     
     drawDetectionOverlay(detection) {

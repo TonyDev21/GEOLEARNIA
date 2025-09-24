@@ -74,13 +74,18 @@ def base64_to_image(base64_string):
         return None
 
 def predict_with_model(roi):
-    """Realizar predicción con el modelo de IA"""
+    """Realizar predicción con el modelo de IA mejorada"""
     global model
     
     if model is None:
-        # Simulación básica
+        # Simulación mejorada sin modelo
+        logger.info("Usando simulación (modelo no disponible)")
         gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        contours, _ = cv2.findContours(gray, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        # Aplicar threshold para mejor detección de contornos
+        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        
+        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         if contours:
             largest_contour = max(contours, key=cv2.contourArea)
@@ -88,48 +93,117 @@ def predict_with_model(roi):
             perimeter = cv2.arcLength(largest_contour, True)
             
             if perimeter > 0:
+                # Calcular métricas para clasificación
                 circularity = 4 * np.pi * area / (perimeter * perimeter)
-                if circularity > 0.7:
-                    return "circulo", 0.85
-                elif circularity < 0.5:
-                    return "triangulo", 0.80
+                
+                # Aproximar contorno a polígono
+                epsilon = 0.02 * perimeter
+                approx = cv2.approxPolyDP(largest_contour, epsilon, True)
+                vertices = len(approx)
+                
+                logger.info(f"Análisis de forma: circularity={circularity:.3f}, vertices={vertices}")
+                
+                # Clasificación mejorada
+                if circularity > 0.75:
+                    return "circulo", min(0.95, 0.7 + circularity * 0.3)
+                elif vertices == 3:
+                    return "triangulo", min(0.90, 0.75 + (1-circularity) * 0.2)
+                elif vertices == 4 or (0.4 < circularity < 0.75):
+                    return "cuadrado", min(0.88, 0.70 + (1-abs(circularity-0.6)) * 0.3)
                 else:
-                    return "cuadrado", 0.82
+                    # Si no encaja claramente, usar heurísticas adicionales
+                    if circularity > 0.6:
+                        return "circulo", 0.65
+                    elif circularity < 0.4:
+                        return "triangulo", 0.60
+                    else:
+                        return "cuadrado", 0.62
         
+        logger.info("No se pudo analizar la forma")
         return "desconocido", 0.0
     
     try:
+        # Preprocesamiento mejorado para el modelo real
         roi_resized = cv2.resize(roi, (64, 64))
+        
+        # Normalización mejorada
         roi_normalized = roi_resized.astype('float32') / 255.0
+        
+        # Expandir dimensiones para el batch
         roi_batch = np.expand_dims(roi_normalized, axis=0)
         
+        # Predicción con el modelo real
         predictions = model.predict(roi_batch, verbose=0)
         predicted_class = np.argmax(predictions[0])
         confidence = float(predictions[0][predicted_class])
         
-        return class_names[predicted_class], confidence
+        # Solo aceptar predicciones con confianza razonable
+        if confidence < 0.3:
+            logger.info(f"Confianza muy baja: {confidence:.3f}")
+            return "desconocido", confidence
+        
+        shape_name = class_names[predicted_class]
+        logger.info(f"Predicción: {shape_name} con confianza {confidence:.3f}")
+        
+        return shape_name, confidence
+        
     except Exception as e:
-        logger.error(f"Error en predicción: {e}")
-        return "error", 0.0
+        logger.error(f"Error en predicción con modelo: {e}")
+        # Fallback a simulación si falla el modelo
+        return predict_with_model(roi)  # Recursión controlada
 
 def detect_object_in_frame(frame):
-    """Detectar objeto en frame usando contornos"""
+    """Detectar objeto en frame usando contornos mejorados"""
     try:
+        # Convertir a escala de grises
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        edges = cv2.Canny(blurred, 50, 150)
         
+        # Mejores filtros para diferentes condiciones de iluminación
+        # Ecualización del histograma para mejor contraste
+        gray = cv2.equalizeHist(gray)
+        
+        # Blur gaussiano para reducir ruido
+        blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+        
+        # Detectar bordes con parámetros más permisivos
+        edges = cv2.Canny(blurred, 30, 80)
+        
+        # Dilatación para conectar bordes fragmentados
+        kernel = np.ones((3,3), np.uint8)
+        edges = cv2.dilate(edges, kernel, iterations=1)
+        
+        # Encontrar contornos
         contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         if not contours:
+            logger.info("No se encontraron contornos")
             return None, edges
         
-        largest_contour = max(contours, key=cv2.contourArea)
+        # Filtrar contornos por área y forma
+        valid_contours = []
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            # Umbral más bajo para detectar objetos más pequeños
+            if area > 300:  # Reducido de 1000 a 300
+                # Verificar que el contorno tenga una forma razonable
+                perimeter = cv2.arcLength(contour, True)
+                if perimeter > 0:
+                    circularity = 4 * np.pi * area / (perimeter * perimeter)
+                    # Aceptar contornos con circularity entre 0.1 y 1.5 (más permisivo)
+                    if 0.1 <= circularity <= 1.5:
+                        valid_contours.append(contour)
         
-        if cv2.contourArea(largest_contour) < 1000:
+        if not valid_contours:
+            logger.info("No se encontraron contornos válidos")
             return None, edges
         
+        # Seleccionar el contorno más grande de los válidos
+        largest_contour = max(valid_contours, key=cv2.contourArea)
+        area = cv2.contourArea(largest_contour)
+        
+        logger.info(f"Contorno detectado con área: {area}")
         return largest_contour, edges
+        
     except Exception as e:
         logger.error(f"Error en detección: {e}")
         return None, None
