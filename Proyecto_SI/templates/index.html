@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEOLEARNIA v3.0 - Reconocimiento Visual Automático</title>
-    <link rel="stylesheet" href="/static/css/geolearnia.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/geolearnia.css') }}">
 </head>
 <body>
     <div class="container">
@@ -48,151 +48,13 @@
         </div>
     </div>
 
-    <script src="/static/js/geolearnia.js"></script>
-</body>
-</html>
-    }
-    
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .subtitle {
-      font-size: 1.2em;
-      margin-bottom: 30px;
-      opacity: 0.9;
-    }
-    
-    .video-container {
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      max-width: 800px;
-    }
-    
-    #video-stream {
-      width: 100%;
-      max-width: 640px;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    
-    .status {
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      font-size: 1.1em;
-    }
-    
-    .loading {
-      display: inline-block;
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-    
-    .instructions {
-      margin-top: 30px;
-      text-align: left;
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .instructions h3 {
-      margin-top: 0;
-      color: #ffd700;
-    }
-    
-    .instructions ul {
-      padding-left: 20px;
-    }
-    
-    .instructions li {
-      margin: 10px 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🎓 GEOLEARNIA</h1>
-    <p class="subtitle">Reconocimiento de Figuras Geométricas con IA</p>
-    
-    <div class="video-container">
-      <img id="video-stream" 
-           src="{{url_for('video')}}" 
-           alt="Stream de video" 
-           onerror="handleVideoError(this)"
-           onload="handleVideoLoad(this)" />
-      
-      <div id="video-status" class="status">
-        <span class="loading">🎥 Cargando stream de video...</span>
-      </div>
-    </div>
-    
-    <div class="instructions">
-      <h3>📋 Instrucciones de Uso:</h3>
-      <ul>
-        <li>🔴 <strong>Círculos:</strong> Muestra monedas, botones, tapas redondas</li>
-        <li>🟦 <strong>Cuadrados:</strong> Muestra libros, cajas, papeles cuadrados</li>
-        <li>🔺 <strong>Triángulos:</strong> Muestra reglas triangulares, formas cortadas</li>
-        <li>💡 Asegúrate de que la figura esté bien iluminada</li>
-        <li>📏 Mantén una distancia apropiada de la cámara</li>
-      </ul>
-    </div>
-  </div>
-
-  <script>
-    let retryCount = 0;
-    const maxRetries = 5;
-    
-    function handleVideoError(img) {
-      console.log('Error cargando video, intento:', retryCount + 1);
-      
-      const status = document.getElementById('video-status');
-      
-      if (retryCount < maxRetries) {
-        retryCount++;
-        status.innerHTML = `⚠️ Reintentando conexión (${retryCount}/${maxRetries})...`;
-        
-        // Reintentar después de 2 segundos
-        setTimeout(() => {
-          img.src = "{{url_for('video')}}?" + new Date().getTime();
-        }, 2000);
-      } else {
-        status.innerHTML = `❌ No se pudo conectar con la cámara.<br>
-                           <small>Verifica que la cámara esté disponible y que hayas dado permisos.</small>`;
-        img.style.display = 'none';
-      }
-    }
-    
-    function handleVideoLoad(img) {
-      document.getElementById('video-status').innerHTML = '✅ Stream activo - ¡Muestra figuras geométricas!';
-      retryCount = 0;
-    }
-    
-    // Verificar estado del stream cada 10 segundos
-    setInterval(() => {
-      const img = document.getElementById('video-stream');
-      if (img.naturalWidth === 0) {
-        handleVideoError(img);
-      }
-    }, 10000);
-  </script>
+    <script src="{{ url_for('static', filename='js/geolearnia.js') }}"></script>
+    <script>
+        // Inicializar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = new GeoLearnia();
+            // El constructor se encarga de la inicialización
+        });
+    </script>
 </body>
 </html>
