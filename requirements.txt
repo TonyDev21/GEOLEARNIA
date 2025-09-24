@@ -7,13 +7,13 @@
 # === DEPENDENCIAS PRINCIPALES ===
 
 # Computer Vision y procesamiento de imágenes
-opencv-python==4.12.0.88
-opencv-contrib-python==4.12.0.88
+opencv-python==4.10.0.84
+opencv-contrib-python==4.10.0.84
 
 # Machine Learning y Deep Learning
-tensorflow==2.18.0
-keras==3.6.0
-numpy>=2.0.0,<2.3.0
+tensorflow==2.17.0
+keras==3.5.0
+numpy>=1.26.0,<2.0.0
 
 # Aplicación web
 Flask==3.1.2
@@ -51,7 +51,7 @@ google-pasta==0.2.0
 libclang==18.1.1
 opt-einsum==3.4.0
 protobuf==4.25.5
-tensorboard==2.18.0
+tensorboard==2.17.0
 tensorboard-data-server==0.7.2
 
 # Utilidades de Flask
