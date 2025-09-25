@@ -542,47 +542,47 @@ class GeoLearnia {
         };
     }
     
-    // Marco CUADRADO FIJO en el centro - SIMPLE
+    // Marco CUADRADO FIJO en el centro - TRIPLICADO DE TAMAÑO
     drawSimpleFrame(shape, confidence, centerX, centerY) {
         const ctx = this.overlayCtx;
         
-        // CUADRADO FIJO SIEMPRE - sin importar la forma
-        const size = 150;
+        // CUADRADO FIJO MÁS GRANDE - sin importar la forma
+        const size = 450; // Triplicado de 150 a 450
         ctx.strokeStyle = '#00ff00';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 4; // Línea más gruesa para el tamaño
         ctx.strokeRect(centerX - size/2, centerY - size/2, size, size);
         
         // Marco interior más pequeño
         ctx.strokeStyle = '#00ff00';
-        ctx.lineWidth = 2;
-        const innerSize = 120;
+        ctx.lineWidth = 3;
+        const innerSize = 360; // Triplicado de 120 a 360
         ctx.strokeRect(centerX - innerSize/2, centerY - innerSize/2, innerSize, innerSize);
         
-        // PUNTERO FIJO en el centro
+        // PUNTERO FIJO en el centro (más grande también)
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+        ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI); // Aumentado de 6 a 10
         ctx.fill();
         ctx.stroke();
         
-        // Punto verde en el centro
+        // Punto verde en el centro (más grande)
         ctx.fillStyle = '#00ff00';
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+        ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI); // Aumentado de 3 a 5
         ctx.fill();
         
-        // Texto arriba del cuadro
-        ctx.font = 'bold 16px Arial';
+        // Texto arriba del cuadro (más grande)
+        ctx.font = 'bold 20px Arial'; // Aumentado de 16px a 20px
         ctx.fillStyle = '#00ff00';
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.textAlign = 'center';
         
         const text = `${shape.toUpperCase()} ${Math.round(confidence * 100)}%`;
-        ctx.strokeText(text, centerX, centerY - 85);
-        ctx.fillText(text, centerX, centerY - 85);
+        ctx.strokeText(text, centerX, centerY - 245); // Ajustado para el nuevo tamaño
+        ctx.fillText(text, centerX, centerY - 245);
         ctx.textAlign = 'left';
     }
     
@@ -664,34 +664,34 @@ class GeoLearnia {
         ctx.textAlign = 'left';
     }
     
-    // CUADRADO DE ESCANEO FIJO en el centro
+    // CUADRADO DE ESCANEO FIJO en el centro - TRIPLICADO
     drawScanningPoint() {
         const ctx = this.overlayCtx;
         const centerX = this.overlay.width / 2;
         const centerY = this.overlay.height / 2;
         
-        // CUADRADO FIJO de detección
-        const size = 150;
+        // CUADRADO FIJO de detección MÁS GRANDE
+        const size = 450; // Triplicado de 150 a 450
         ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3; // Línea más gruesa
         ctx.strokeRect(centerX - size/2, centerY - size/2, size, size);
         
-        // Cuadrado interior pulsante
-        const pulseSize = 120 + Math.sin(Date.now() / 400) * 10;
+        // Cuadrado interior pulsante MÁS GRANDE
+        const pulseSize = 360 + Math.sin(Date.now() / 400) * 20; // Triplicado y más pulso
         ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.strokeRect(centerX - pulseSize/2, centerY - pulseSize/2, pulseSize, pulseSize);
         
-        // Punto central
+        // Punto central MÁS GRANDE
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+        ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI); // Aumentado de 4 a 8
         ctx.fill();
         
-        // Esquinas del cuadrado para mejor visibilidad
-        const cornerLength = 20;
+        // Esquinas del cuadrado para mejor visibilidad - MÁS GRANDES
+        const cornerLength = 60; // Triplicado de 20 a 60
         ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 4; // Línea más gruesa
         
         const halfSize = size / 2;
         
@@ -723,11 +723,11 @@ class GeoLearnia {
         ctx.lineTo(centerX + halfSize, centerY + halfSize - cornerLength);
         ctx.stroke();
         
-        // Texto instructivo
-        ctx.font = 'bold 12px Arial';
+        // Texto instructivo MÁS GRANDE
+        ctx.font = 'bold 16px Arial'; // Aumentado de 12px a 16px
         ctx.fillStyle = 'rgba(255,255,255,0.8)';
         ctx.textAlign = 'center';
-        ctx.fillText('Coloca objeto dentro del cuadro', centerX, centerY + 95);
+        ctx.fillText('Coloca objeto dentro del cuadro', centerX, centerY + 280); // Ajustado para el nuevo tamaño
         ctx.textAlign = 'left';
     }
     
