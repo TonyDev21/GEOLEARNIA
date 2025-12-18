@@ -86,6 +86,11 @@ secrets.json
 
 # === DEPENDENCIAS ===
 node_modules/
+package-lock.json
+
+# === ELECTRON ===
+dist/
+out/
 
 # === ARCHIVOS DE RESPALDO ===
 *.bak

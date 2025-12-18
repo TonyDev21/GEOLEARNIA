@@ -1,0 +1,69 @@
+{
+  "name": "geolearnia",
+  "version": "3.0.0",
+  "description": "Aplicación de escritorio para reconocimiento de figuras geométricas con IA",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:win-installer": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "electron",
+    "geolearnia",
+    "ia",
+    "reconocimiento",
+    "geometria"
+  ],
+  "author": "TonyDev21",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "build": {
+    "appId": "com.tonydev21.geolearnia",
+    "productName": "GEOLEARNIA",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "loading.html",
+      "app.py",
+      "Proyecto_SI/**/*",
+      "!Proyecto_SI/dataset/**/*",
+      "python-embed/**/*"
+    ],
+    "asarUnpack": [
+      "python-embed/**/*",
+      "app.py",
+      "Proyecto_SI/**/*"
+    ],
+    "win": {
+      "target": {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      "icon": "Proyecto_SI/static/icon.ico",
+      "requestedExecutionLevel": "asInvoker",
+      "sign": null,
+      "verifyUpdateCodeSignature": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "Proyecto_SI/static/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "Proyecto_SI/static/icon.png"
+    }
+  }
+}

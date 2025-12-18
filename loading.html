@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cargando GEOLEARNIA</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+        .container {
+            text-align: center;
+        }
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #667eea;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0 0 20px;
+        }
+        p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 16px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 GEOLEARNIA</h1>
+        <div class="loader"></div>
+        <p>Cargando sistema de IA...</p>
+        <p class="status">Iniciando TensorFlow y modelos de reconocimiento</p>
+        <p class="status" style="font-size: 14px; margin-top: 30px;">Esto puede tomar 30-60 segundos la primera vez</p>
+    </div>
+    <script>
+        // Intentar conectar a Flask cada segundo
+        let attempts = 0;
+        const checkServer = setInterval(() => {
+            attempts++;
+            fetch('http://127.0.0.1:5000')
+                .then(response => {
+                    if (response.ok) {
+                        clearInterval(checkServer);
+                        window.location.href = 'http://127.0.0.1:5000';
+                    }
+                })
+                .catch(() => {
+                    console.log(`Esperando servidor... intento ${attempts}`);
+                });
+        }, 1000);
+    </script>
+</body>
+</html>
